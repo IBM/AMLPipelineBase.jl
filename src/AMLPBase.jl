@@ -10,6 +10,14 @@ include("utils.jl")
 using .Utils
 export getiris, getprofb
 
+include("baselinemodels.jl")
+using .BaselineModels
+export Baseline, Identity
+
+include("basefilters.jl")
+using .BaseFilters
+export OneHotEncoder, Imputer
+
 include("decisiontree.jl")
 using .DecisionTreeLearners
 export PrunedTree, RandomForest, Adaboost
@@ -22,5 +30,9 @@ include("pipelines.jl")
 using .Pipelines
 export @pipeline, @pipelinex, @pipelinez
 export Pipeline, ComboPipeline
+
+include("crossvalidator.jl")
+using .CrossValidators
+export crossvalidate
 
 end # module

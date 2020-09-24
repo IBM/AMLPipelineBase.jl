@@ -4,29 +4,21 @@ using Random
 using Test
 using AMLPBase
 using AMLPBase.Pipelines
-using AMLPBase.BaseFilters
-using AMLPBase.SKPreprocessors
 using AMLPBase.DecisionTreeLearners
+using AMLPBase.CrossValidators
 using AMLPBase.Utils
-using AMLPBase.FeatureSelectors
 
-global const data = getiris()
+global const data     = getiris()
 global const features = data[:,1:4]
-global const X=data[:,1:5]
-const Y=data[:,5] |> Vector
-X[!,5]= X[!,5] .|> string
-
+global const X        = data[:,1:5]
+const Y               = data[:,5] |> Vector
+X[!,5]                = X[!,5] .|> string
 
 global const ohe = OneHotEncoder()
-global const pca = SKPreprocessor("PCA")
-global const ica = SKPreprocessor("FastICA")
-global const fa = SKPreprocessor("FactorAnalysis")
-global const disc = CatNumDiscriminator()
-global const catf = CatFeatureSelector()
-global const numf = NumFeatureSelector()
-global const rf = RandomForest()
+global const noop = Identity()
+global const rf  = RandomForest()
 global const ada = Adaboost()
-global const pt = PrunedTree()
+global const pt  = PrunedTree()
 
 function test_pipeline()
   # test initialization of types
@@ -57,44 +49,30 @@ end
   test_pipeline()
 end
 
+acc(X,Y) = score(:accuracy,X,Y)
+
 function test_sympipeline()
-  pcombo5 = @pipeline :((numf |> pca) + (numf |> ica) |> (ada * rf * pt))
-  @test crossvalidate(pcombo5,X,Y,"accuracy_score",10,false).mean >= 0.90
-  expr = :((numf |> pca) + (numf |> ica) |> (ada * rf * pt))
+  pcombo5 = @pipeline :((ohe + noop) |> (ada * rf * pt))
+  @test crossvalidate(pcombo5,X,Y,acc).mean >= 0.90
+  expr = :((ohe + noop) |> (ada * rf * pt))
   processexpr!(expr.args)
-  @test crossvalidate(eval(expr),X,Y,"accuracy_score",10,false).mean >= 0.90
-  expr = :((numf |> pca) + (numf |> ica) |> (ada * rf * pt))
+  @test crossvalidate(eval(expr),X,Y,acc).mean >= 0.90
   pcombo6 = sympipeline(expr) |> eval
-  @test crossvalidate(pcombo6,X,Y,"accuracy_score",10,false).mean >= 0.90
+  @test crossvalidate(pcombo6,X,Y,acc).mean >= 0.90
   pcombo7 = (@pipelinez expr) |> eval
-  @test crossvalidate(pcombo7,X,Y,"accuracy_score",10,false).mean >= 0.90
+  @test crossvalidate(pcombo7,X,Y,acc).mean >= 0.90
 end
 @testset "Symbolic Pipeline: Global Scope" begin
   Random.seed!(123)
   test_sympipeline()
 end
 
-
 function test_pipeline()
-  ohe = OneHotEncoder()
-  pca = SKPreprocessor("PCA")
-  ica = SKPreprocessor("FastICA")
-  fa = SKPreprocessor("FactorAnalysis")
-  disc = CatNumDiscriminator()
-  catf = CatFeatureSelector()
-  numf = NumFeatureSelector()
-  rf = RandomForest()
-  ada = Adaboost()
-  pt = PrunedTree()
   # test symbolic pipeline expression 
-  pcombo2 = @pipeline (pca |> ica) + ica + pca
-  @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 162
-  pcombo2 = @pipeline pca |> ica |> fa
-  @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 154
-  pcombo3 = @pipeline disc |> ((catf + numf) + (numf |> pca) + (numf |> ica) + (catf|>ohe)) |> rf
-  (fit_transform!(pcombo3,X,Y)  .== Y) |> sum == 150
-  pcombo4 = @pipeline (numf |> pca) + (numf |> ica) |> (ada * rf * pt)
-  @test crossvalidate(pcombo4,X,Y,"accuracy_score",10,false).mean >= 0.90
+  pcombo2 = @pipeline ohe + noop
+  @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
+  pcombo2 = @pipeline ohe + noop |> rf
+  @test crossvalidate(pcombo2,X,Y,acc).mean >= 0.90
 end
 @testset "Symbolic Pipeline: Local Scope" begin
   Random.seed!(123)
