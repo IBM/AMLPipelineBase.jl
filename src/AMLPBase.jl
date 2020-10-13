@@ -5,6 +5,7 @@ greet() = print("Hello World!")
 include("abstracttypes.jl")
 using .AbsTypes
 export Machine, Computer, Workflow, Learner, Transformer
+export fit!, transform!, fit_transform!
 
 include("utils.jl")
 using .Utils

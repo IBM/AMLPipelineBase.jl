@@ -10,7 +10,7 @@ using ..AbsTypes: Machine, Transformer, Learner, Workflow, Computer
 
 import ..AbsTypes: fit!, transform!
 export fit!,transform!
-export OneHotEncoder, Imputer
+export OneHotEncoder, Imputer, Wrapper
 
 """
     OneHotEncoder(Dict(
@@ -132,7 +132,8 @@ mutable struct Imputer <: Transformer
     default_args = Dict(
       # Imputation strategy.
       # Statistic that takes a vector such as mean or median.
-      :strategy => mean
+      :strategy => mean,
+      :name => "imptr",
     )
     cargs=nested_dict_merge(default_args,args)
     cargs[:name] = cargs[:name]*"_"*randstring(3)
@@ -185,9 +186,10 @@ mutable struct Wrapper <: Transformer
   function Wrapper(args=Dict())
     default_args = Dict(
       # Transformer to call.
+      :name => "wrpr",
       :transformer => OneHotEncoder(),
       # Transformer args.
-      :transformer_args => nothing
+      :transformer_args => Dict()
     )
     cargs=nested_dict_merge(default_args,args)
     cargs[:name] = cargs[:name]*"_"*randstring(3)
@@ -195,7 +197,7 @@ mutable struct Wrapper <: Transformer
   end
 end
 
-function fit!(wrapper::Wrapper, instances::DataFrame, labels::Vector) 
+function fit!(wrapper::Wrapper, instances::DataFrame, labels::Vector=[]) 
   transformer_args = wrapper.args[:transformer_args]
   transformer = createtransformer(
     wrapper.args[:transformer],
@@ -229,7 +231,7 @@ Create transformer
 Returns: new transformer.
 """
 function createtransformer(prototype::Transformer, args=Dict())
-  new_args = copy(prototype.args)
+  new_args = deepcopy(prototype.args)
   if args != Dict()
     new_args = mergedict(new_args, args)
   end
