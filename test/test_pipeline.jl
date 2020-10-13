@@ -8,17 +8,17 @@ using AMLPBase.DecisionTreeLearners
 using AMLPBase.CrossValidators
 using AMLPBase.Utils
 
-global const data     = getiris()
-global const features = data[:,1:4]
-global const X        = data[:,1:5]
+const data     = getiris()
+const features = data[:,1:4]
+const X        = data[:,1:5]
 const Y               = data[:,5] |> Vector
 X[!,5]                = X[!,5] .|> string
 
-global const ohe = OneHotEncoder()
-global const noop = Identity()
-global const rf  = RandomForest()
-global const ada = Adaboost()
-global const pt  = PrunedTree()
+const ohe = OneHotEncoder()
+const noop = Identity()
+const rf  = RandomForest()
+const ada = Adaboost()
+const pt  = PrunedTree()
 
 function test_pipeline()
   # test initialization of types
@@ -53,14 +53,14 @@ acc(X,Y) = score(:accuracy,X,Y)
 
 function test_sympipeline()
   pcombo5 = @pipeline :((ohe + noop) |> (ada * rf * pt))
-  @test crossvalidate(pcombo5,X,Y,acc).mean >= 0.90
+  @test crossvalidate(pcombo5,X,Y,acc,5,false).mean >= 0.90
   expr = :((ohe + noop) |> (ada * rf * pt))
   processexpr!(expr.args)
-  @test crossvalidate(eval(expr),X,Y,acc).mean >= 0.90
+  @test crossvalidate(eval(expr),X,Y,acc,5,false).mean >= 0.90
   pcombo6 = sympipeline(expr) |> eval
-  @test crossvalidate(pcombo6,X,Y,acc).mean >= 0.90
+  @test crossvalidate(pcombo6,X,Y,acc,5,false).mean >= 0.90
   pcombo7 = (@pipelinez expr) |> eval
-  @test crossvalidate(pcombo7,X,Y,acc).mean >= 0.90
+  @test crossvalidate(pcombo7,X,Y,acc,5,false).mean >= 0.90
 end
 @testset "Symbolic Pipeline: Global Scope" begin
   Random.seed!(123)
@@ -72,7 +72,7 @@ function test_pipeline()
   pcombo2 = @pipeline ohe + noop
   @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
   pcombo2 = @pipeline ohe + noop |> rf
-  @test crossvalidate(pcombo2,X,Y,acc).mean >= 0.90
+  @test crossvalidate(pcombo2,X,Y,acc,5,false).mean >= 0.90
 end
 @testset "Symbolic Pipeline: Local Scope" begin
   Random.seed!(123)
