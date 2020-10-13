@@ -4,6 +4,7 @@ using ..AbsTypes: Machine
 using Statistics
 using DataFrames
 using CSV
+using PooledArrays
 
 import MLBase: Kfold
 
@@ -136,6 +137,10 @@ function infer_eltype(df::DataFrame)
   infer_eltype(Matrix(df))
 end
 
+function infer_eltype(pd::PooledArray)
+  infer_eltype(collect(pd))
+end
+
 function infer_eltype(mtrx::Matrix)
   # Obtain element type of matrix
   mat_eltype = eltype(mtrx)
@@ -227,19 +232,22 @@ function nested_dict_merge(first::Dict, second::Dict)
   return target
 end
 
+mergedict = nested_dict_merge
+
+
 """
     createmachine(prototype::Machine, options=nothing)
 
 Create machine
 
 - `prototype`: prototype machine to base new machine on
-- `options`: additional options to override prototype's options
+- `args`: additional options to override prototype's options
 
 Returns: new machine
 """
 function createmachine(prototype::Machine, args::Dict=Dict())
   new_args = copy(prototype.args)
-  if args != Dict()
+  if args != Dict() # if not empty Dict, merge 
     new_args = nested_dict_merge(new_args, args)
   end
 
@@ -286,37 +294,6 @@ function skipstd(x::T) where {T<:Union{AbstractArray,DataFrame}}
   else
     std(skipmissing(x))
   end
-end
-
-
-"""
-    mergedict(first::Dict, second::Dict)
-    
-Second nested dictionary is merged into first.
-
-If a second dictionary's value as well as the first
-are both dictionaries, then a merge is conducted between
-the two inner dictionaries.
-Otherwise the second's value overrides the first.
-
-- `first`: first nested dictionary
-- `second`: second nested dictionary
-
-Returns: merged nested dictionary
-"""
-function mergedict(first::Dict, second::Dict)
-  target = copy(first)
-  for (second_key, second_value) in second
-    values_both_dict =
-      typeof(second_value) <: Dict &&
-      typeof(get(target, second_key, nothing)) <: Dict
-    if values_both_dict
-      target[second_key] = mergedict(target[second_key], second_value)
-    else
-      target[second_key] = second_value
-    end
-  end
-  return target
 end
 
 function getiris()

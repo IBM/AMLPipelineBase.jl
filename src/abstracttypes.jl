@@ -6,9 +6,9 @@ export fit!, transform!, fit_transform!
 export Machine, Learner, Transformer, Workflow, Computer
 
 abstract type Machine end
-abstract type Computer <: Machine end # does computation: learner and transformer
-abstract type Workflow <: Machine end # types: Linear vs Combine
-abstract type Learner <: Computer end
+abstract type Computer    <: Machine  end # does computation: learner and transformer
+abstract type Workflow    <: Machine  end # types: Linear vs Combine
+abstract type Learner     <: Computer end
 abstract type Transformer <: Computer end
 
 """
