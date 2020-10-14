@@ -25,7 +25,7 @@ abstract type Learner     <: Computer end
 abstract type Transformer <: Computer end
 ```
 
-**AMLPBase** dynamically dispatches on the **fit!** and **transform!**
+**AMLPBase** dynamically dispatches the **fit!** and **transform!**
 functions which must be overloaded by different subtypes of **Machine**.
 ```julia
 function fit!(mc::Machine, input::DataFrame, output::Vector)
