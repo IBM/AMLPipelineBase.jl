@@ -5,8 +5,8 @@
 
 ### AMLPBase.jl
 ---------------
-is the **Base** package of [TSML](https://github.com/IBM/TSML.jl) 
-and [AutoMLPipeline](https://github.com/IBM/AutoMLPipeline.jl).
+is the **Base** package of [TSML.jl](https://github.com/IBM/TSML.jl) 
+and [AutoMLPipeline.jl](https://github.com/IBM/AutoMLPipeline.jl).
 **AMLPBase** is written in pure **Julia**. It exposes the abstract 
 types commonly shared by **TSML** and **AutoMLPipeline**.
 It also contains basic data preprocessing routines and 
