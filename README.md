@@ -12,7 +12,11 @@ types commonly shared by **TSML** and **AutoMLPipeline**.
 It also contains basic data preprocessing routines and 
 learners for rapid prototyping. **TSML** extends **AMLPBase** capability
 by specializing in Time-Series workflow while **AutoMLPipeline**
-focuses in ML pipeline optimization.
+focuses in ML pipeline optimization. Since
+**AMLPBase** is written in pure **Julia** including its
+dependencies, the future target will 
+be to exploit Julia's native multi-threading 
+using thread-safe ML **Julia** libraries for scalability and performance.
 
 **AMLPBase** declares the following abstract data types:
 ```julia
@@ -36,9 +40,10 @@ end
 ```
 
 ### Motivations
-To provide a Base package for common functions and abstractions shared by:
-- [AutoMLPipeline](https://github.com/IBM/AutoMLPipeline.jl): A package for ML Pipeline Optimization
-- [TSML](https://github.com/IBM/TSML.jl): A package for Time-Series ML
+- To provide a **Base** package for common functions and abstractions shared by:
+  - [AutoMLPipeline](https://github.com/IBM/AutoMLPipeline.jl): A package for ML Pipeline Optimization
+  - [TSML](https://github.com/IBM/TSML.jl): A package for Time-Series ML
+- To implement efficient multi-threading reduction workflow
 
 ### Package Features
 - Symbolic pipeline API for high-level description and 
@@ -63,14 +68,7 @@ julia> ]
 pkg> update
 pkg> add AMLPBase
 ```
-or
-```julia
-julia> using Pkg
-julia> Pkg.update()
-julia> Pkg.add("AMLPBase")
-```
 
-### Sample Usage
 Below outlines some typical way to preprocess and model any dataset.
 
 ##### 1. Load Data, Extract Input (X) and Target (Y) 
