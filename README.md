@@ -59,7 +59,7 @@ end
 
 ### Installation
 
-AutoMLPipeline is in the Julia Official package registry.
+AMLPBase is in the Julia Official package registry.
 The latest release can be installed at the Julia
 prompt using Julia's package management which is triggered
 by pressing `]` at the julia prompt:
@@ -308,7 +308,7 @@ julia> print_tree(stdout, expr)
 └─ :rf
 ```
 
-### Extending AutoMLPipeline
+### Extending AMLPBase
 ```
 # If you want to add your own filter/transformer/learner, it is trivial. 
 # Just take note that filters and transformers process the first 
@@ -322,9 +322,9 @@ julia> print_tree(stdout, expr)
 # as the main data interchange format.
 
 using DataFrames
-using AutoMLPipeline.AbsTypes, AutoMLPipeline.Utils
+using AMLPBase.AbsTypes, AMLPBase.Utils
 
-import AutoMLPipeline.AbsTypes: fit!, transform!  #for function overloading 
+import AMLPBase.AbsTypes: fit!, transform!  #for function overloading 
 
 export fit!, transform!, MyFilter
 
