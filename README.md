@@ -85,12 +85,12 @@ head(profbdata)
 #### 2. Load Filters, Transformers, and Learners 
 ```julia
 #### Decomposition
-pca = Normalizer(Dict(:method=>:pca))
-fa  = Normalizer(Dict(:method=>:fa))
+pca = Normalizer(:pca)
+fa  = Normalizer(:fa)
 
 #### Scaler 
-zscore = Normalizer(Dict(:method = >:zscore))
-unitr  = Normalizer(Dict(:method = >:unitrange));
+zscore = Normalizer(:zscore)
+unitr  = Normalizer(:unitrange);
 
 #### categorical preprocessing
 ohe = OneHotEncoder()
@@ -216,7 +216,7 @@ using Random
 using DataFrames
 using Distributed
 
-nprocs() == 1 && addprocs(3;exeflags="--project")
+nprocs() == 1 && addprocs()
 @everywhere using DataFrames
 @everywhere using AMLPBase
 
@@ -260,7 +260,7 @@ below.
 ```julia
 expr = @pipeline ( 
                    ((numf |> zscore)+(catf |> ohe) |> ada) + ((numf |> zscore)+(catf |> ohe) |> rf) 
-              ) |> ohe |> rf;                
+                 ) |> ohe |> rf;                
 crossvalidate(expr,X,Y,acc,10,true)
 ```
 One can even include selector function as part of transformer preprocessing routine:
