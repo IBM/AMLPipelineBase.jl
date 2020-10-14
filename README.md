@@ -1,10 +1,10 @@
-
+### AMLPBase.jl
+---------------
 | **Documentation** | **Build Status** | **Help** |
 |:---:|:---:|:---:|
 | [![][docs-dev-img]][docs-dev-url] [![][docs-stable-img]][docs-stable-url] | [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] | [![][slack-img]][slack-url] [![][gitter-img]][gitter-url] |
 
-### AMLPBase.jl
----------------
+[AMLPBase.jl](https://github.com/IBM/AMLPBase.jl) 
 is the **Base** package of [TSML.jl](https://github.com/IBM/TSML.jl) 
 and [AutoMLPipeline.jl](https://github.com/IBM/AutoMLPipeline.jl).
 **AMLPBase** is written in pure **Julia**. It exposes the abstract 
@@ -14,7 +14,6 @@ learners for rapid prototyping. **TSML** extends **AMLPBase** capability
 by specializing in Time-Series workflow while **AutoMLPipeline**
 focuses in ML pipeline optimization.
 
-### Abstractions
 **AMLPBase** declares the following abstract data types:
 ```julia
 abstract type Machine end
