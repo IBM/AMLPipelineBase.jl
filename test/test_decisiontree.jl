@@ -1,8 +1,7 @@
 module TestDecisionTree
 
 using Test
-using AMLPBase.DecisionTreeLearners
-using AMLPBase.Utils
+using AMLPBase
 using Random
 using DataFrames: nrow, DataFrame
 

@@ -3,7 +3,6 @@ module TestCrossValidator
 using Test
 using Random
 using AMLPBase
-using AMLPBase.Utils
 
 function test_crossvalidator()
   racc = 50.0

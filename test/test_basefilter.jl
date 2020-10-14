@@ -3,8 +3,6 @@ module TestBaseFilter
 using Random
 using Test
 using AMLPBase
-using AMLPBase.Utils
-using AMLPBase.BaseFilters
 using DataFrames
 
 function test_basefilter()

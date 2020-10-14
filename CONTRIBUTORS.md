@@ -1,6 +1,6 @@
-Copyright for portions of project AutoMLPipeline.jl are held by Samuel Jenkins, 2014 as part of project Orchestra.jl.
+Copyright for portions of project AMLPBase.jl are held by Samuel Jenkins, 2014 as part of project Orchestra.jl.
 
-All other copyright for project AutoMLPipeline.jl are held by IBM.
+All other copyright for project AMLPBase.jl are held by IBM.
 
 This is an open source project sponsored and copyrighted by IBM. 
 
@@ -12,9 +12,3 @@ We use GitHub issue tracker for any issue/bug reporting and discussion.
 
 ## Contributors
 - [Paulito Palmes, IBM Research](https://github.com/ppalmes): data structures/types, algorithms, pipeline, and general workflow
-
-## Collaborators
-- [Akihiro Kishimoto, IBM Research](https://researcher.watson.ibm.com/researcher/view.php?person=ie-AKIHIROK)
-- [Radu Marinescu, IBM Research](https://researcher.watson.ibm.com/researcher/view.php?person=ie-radu.marinescu)
-- [Parikshit Ram, IBM Research](https://rithram.github.io/)
-- [Elizabeth Daly, IBM Research](https://researcher.watson.ibm.com/researcher/view.php?person=ie-elizabeth.daly)

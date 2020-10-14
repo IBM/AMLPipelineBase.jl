@@ -11,4 +11,8 @@ include("test_ensemble.jl")
 include("test_crossvalidator.jl")
 include("test_pipeline.jl")
 
+include("test_featureselector.jl")
+include("test_naremover.jl")
+include("test_normalizer.jl")
+
 end

@@ -2,10 +2,7 @@ module TestEnsembleMethods
 
 using Test
 using Random
-using AMLPBase.AbsTypes
-using AMLPBase.Utils
-using AMLPBase.EnsembleMethods
-using AMLPBase.DecisionTreeLearners
+using AMLPBase
 using DataFrames
 
 function generateXY()
