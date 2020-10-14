@@ -57,6 +57,55 @@ end
     specialized preprocessing routines based on types
 - Normalizers (zscore, unitrange, pca, fa) and Ensemble learners (voting, stacks, best)
 
+### Extending AMLPBase
+```
+# If you want to add your own filter/transformer/learner, it is trivial. 
+# Just take note that filters and transformers process the first 
+# input features and ignores the target output while learners process both 
+# the input features and target output arguments of the fit! function. 
+# transform! function always expect one input argument in all cases. 
+
+# First, import the abstract types and define your own mutable structure 
+# as subtype of either Learner or Transformer. Also import the fit! and
+# transform! functions to be overloaded. Also load the DataFrames package
+# as the main data interchange format.
+
+using DataFrames
+using AMLPBase.AbsTypes, AMLPBase.Utils
+
+import AMLPBase.AbsTypes: fit!, transform!  #for function overloading 
+
+export fit!, transform!, MyFilter
+
+# define your filter structure
+mutable struct MyFilter <: Transformer
+  name::String
+  model::Dict
+  args::Dict
+  function MyFilter(args::Dict())
+      ....
+  end
+end
+
+# define your fit! function. 
+# filters and transformer ignore the target argument. 
+# learners process both the input features and target argument.
+function fit!(fl::MyFilter, inputfeatures::DataFrame, target::Vector=Vector())
+     ....
+end
+
+#define your transform! function
+function transform!(fl::MyFilter, inputfeatures::DataFrame)::DataFrame
+     ....
+end
+
+# Note that the main data interchange format is a dataframe so transform! 
+# output should always be a dataframe as well as the input for fit! and transform!.
+# This is necessary so that the pipeline passes the dataframe format consistently to
+# its filters/transformers/learners. Once you have this filter, you can use 
+# it as part of the pipeline together with the other learners and filters.
+```
+
 ### Installation
 
 AMLPBase is in the Julia Official package registry.
@@ -308,54 +357,6 @@ julia> print_tree(stdout, expr)
 └─ :rf
 ```
 
-### Extending AMLPBase
-```
-# If you want to add your own filter/transformer/learner, it is trivial. 
-# Just take note that filters and transformers process the first 
-# input features and ignores the target output while learners process both 
-# the input features and target output arguments of the fit! function. 
-# transform! function always expect one input argument in all cases. 
-
-# First, import the abstract types and define your own mutable structure 
-# as subtype of either Learner or Transformer. Also import the fit! and
-# transform! functions to be overloaded. Also load the DataFrames package
-# as the main data interchange format.
-
-using DataFrames
-using AMLPBase.AbsTypes, AMLPBase.Utils
-
-import AMLPBase.AbsTypes: fit!, transform!  #for function overloading 
-
-export fit!, transform!, MyFilter
-
-# define your filter structure
-mutable struct MyFilter <: Transformer
-  name::String
-  model::Dict
-  args::Dict
-  function MyFilter(args::Dict())
-      ....
-  end
-end
-
-# define your fit! function. 
-# filters and transformer ignore the target argument. 
-# learners process both the input features and target argument.
-function fit!(fl::MyFilter, inputfeatures::DataFrame, target::Vector=Vector())
-     ....
-end
-
-#define your transform! function
-function transform!(fl::MyFilter, inputfeatures::DataFrame)::DataFrame
-     ....
-end
-
-# Note that the main data interchange format is a dataframe so transform! 
-# output should always be a dataframe as well as the input for fit! and transform!.
-# This is necessary so that the pipeline passes the dataframe format consistently to
-# its filters/transformers/learners. Once you have this filter, you can use 
-# it as part of the pipeline together with the other learners and filters.
-```
 
 ### Feature Requests and Contributions
 
