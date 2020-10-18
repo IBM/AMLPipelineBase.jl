@@ -39,9 +39,9 @@ include("ensemble.jl")
 using .EnsembleMethods
 export VoteEnsemble, StackEnsemble, BestLearner
 
-include("svm.jl")
-using .SVMModels
-export SVMModel, svmlearners
+#include("svm.jl")
+#using .SVMModels
+#export SVMModel, svmlearners
 
 include("crossvalidator.jl")
 using .CrossValidators
