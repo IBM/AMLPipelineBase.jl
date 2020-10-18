@@ -93,10 +93,10 @@ function transform!(ohe::OneHotEncoder, pinstances::DataFrame)
       for row in 1:size(instances, 1)
         entry_value = instances[row, column]
         entry_value_index = findfirst(isequal(entry_value),col_values)
-        if entry_value_index == 0
-          warn("Unseen value found in OneHotEncoder,
+        if entry_value_index == 0 || entry_value_index == nothing
+          @warn "Unseen value found in OneHotEncoder,
                 for entry ($row, $column) = $(entry_value).
-                Patching value to $(col_values[1]).")
+                Patching value to $(col_values[1])."
           entry_value_index = 1
         end
         entry_column = (col_start_index - 1) + entry_value_index
