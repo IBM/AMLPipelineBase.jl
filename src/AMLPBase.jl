@@ -41,7 +41,7 @@ export VoteEnsemble, StackEnsemble, BestLearner
 
 include("svm.jl")
 using .SVMModels
-export SVMModel
+export SVMModel, svmlearners
 
 include("crossvalidator.jl")
 using .CrossValidators

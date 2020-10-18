@@ -69,15 +69,11 @@ function diabetes_test()
 
     disc = CatNumDiscriminator(20)
     pl = @pipeline disc |> ( (catf |> ohe)) |> rf
-    @test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
+    @test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60
 
     disc = CatNumDiscriminator(50)
     pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> rf
-    @test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
-
-    disc = CatNumDiscriminator(100)
-    pl = @pipeline disc |> ((numf |> zscore |>  fa) + (catf |> ohe)) |> rf
-    @test crossvalidate(pl,X,Y,acc,20,false).mean > 0.60
+    @test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60
 end
 @testset "Feature Selectors: Diabetes" begin
     Random.seed!(123)
