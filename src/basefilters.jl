@@ -47,18 +47,18 @@ mutable struct OneHotEncoder <: Transformer
   end
 end
 
-function fit!(ohe::OneHotEncoder, instances::DataFrame, labels::Vector=[]) 
+function fit!(ohe::OneHotEncoder, myinstances::DataFrame, labels::Vector=[]) 
   # Obtain nominal columns
   nominal_columns = ohe.args[:nominal_columns]
   if nominal_columns == Int[]
-    nominal_columns,_ = find_catnum_columns(instances)
+    nominal_columns,_ = find_catnum_columns(myinstances)
   end
 
   # Obtain unique values for each nominal column
   nominal_column_values_map = ohe.args[:nominal_column_values_map]
   if nominal_column_values_map == Dict{Int,Any}()
     for column in nominal_columns
-      nominal_column_values_map[column] = unique(instances[:, column])
+      nominal_column_values_map[column] = unique(myinstances[:, column])
     end
   end
 
@@ -70,13 +70,13 @@ function fit!(ohe::OneHotEncoder, instances::DataFrame, labels::Vector=[])
 end
 
 function transform!(ohe::OneHotEncoder, pinstances::DataFrame)
-  instances = deepcopy(pinstances)
+  myinstances = deepcopy(pinstances)
   nominal_columns = ohe.model[:nominal_columns]
   nominal_column_values_map = ohe.model[:nominal_column_values_map]
 
   # Create new transformed instance matrix of type Float64
-  num_rows = size(instances, 1)
-  num_columns = (size(instances, 2) - length(nominal_columns))
+  num_rows = size(myinstances, 1)
+  num_columns = (size(myinstances, 2) - length(nominal_columns))
   if !isempty(nominal_column_values_map)
     num_columns += sum(map(x -> length(x), values(nominal_column_values_map)))
   end
@@ -84,16 +84,16 @@ function transform!(ohe::OneHotEncoder, pinstances::DataFrame)
 
   # Fill transformed instance matrix
   col_start_index = 1
-  for column in 1:size(instances, 2)
+  for column in 1:size(myinstances, 2)
     if !in(column, nominal_columns)
-      transformed_instances[:, col_start_index] = instances[:, column]
+      transformed_instances[:, col_start_index] = myinstances[:, column]
       col_start_index += 1
     else
       col_values = nominal_column_values_map[column]
-      for row in 1:size(instances, 1)
-        entry_value = instances[row, column]
+      for row in 1:size(myinstances, 1)
+        entry_value = myinstances[row, column]
         entry_value_index = findfirst(isequal(entry_value),col_values)
-        if entry_value_index == 0 || entry_value_index == nothing
+        if entry_value_index == nothing 
           @warn "Unseen value found in OneHotEncoder,
                 for entry ($row, $column) = $(entry_value).
                 Patching value to $(col_values[1])."
@@ -141,16 +141,16 @@ mutable struct Imputer <: Transformer
   end
 end
 
-function fit!(imp::Imputer, instances::DataFrame, labels::Vector=[]) 
+function fit!(imp::Imputer, myinstances::DataFrame, labels::Vector=[]) 
   imp.model = imp.args
 end
 
-function transform!(imp::Imputer, instances::DataFrame) 
-  new_instances = deepcopy(instances)
+function transform!(imp::Imputer, myinstances::DataFrame) 
+  new_instances = deepcopy(myinstances)
   strategy = imp.model[:strategy]
 
-  for column in 1:size(instances, 2)
-    column_values = instances[:, column]
+  for column in 1:size(myinstances, 2)
+    column_values = myinstances[:, column]
     col_eltype = infer_eltype(column_values)
 
     if <:(col_eltype, Real)
@@ -197,7 +197,7 @@ mutable struct Wrapper <: Transformer
   end
 end
 
-function fit!(wrapper::Wrapper, instances::DataFrame, labels::Vector=[]) 
+function fit!(wrapper::Wrapper, myinstances::DataFrame, labels::Vector=[]) 
   transformer_args = wrapper.args[:transformer_args]
   transformer = createtransformer(
     wrapper.args[:transformer],
@@ -207,7 +207,7 @@ function fit!(wrapper::Wrapper, instances::DataFrame, labels::Vector=[])
   if transformer_args != Dict()
     transformer_args = mergedict(transformer.args, transformer_args)
   end
-  fit!(transformer, instances, labels)
+  fit!(transformer, myinstances, labels)
 
   wrapper.model = Dict(
     :transformer => transformer,
@@ -215,9 +215,9 @@ function fit!(wrapper::Wrapper, instances::DataFrame, labels::Vector=[])
   )
 end
 
-function transform!(wrapper::Wrapper, instances::DataFrame)
+function transform!(wrapper::Wrapper, myinstances::DataFrame)
   transformer = wrapper.model[:transformer]
-  return transform!(transformer, instances) 
+  return transform!(transformer, myinstances) 
 end
 
 """
