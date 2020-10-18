@@ -13,6 +13,8 @@ using DataFrames: DataFrame
 
 export crossvalidate
 
+macc(X,Y) = score(:accuracy,X,Y)
+
 """
     crossvalidate(pl::Machine,X::DataFrame,Y::Vector,pfunc::Function,kfolds=10) 
 
@@ -21,7 +23,7 @@ Run K-fold crossvalidation where:
 - `X` and `Y` are input and target 
 """
 function crossvalidate(pl::Machine,X::DataFrame,Y::Vector,
-		       pfunc::Function,nfolds::Int=10,verbose::Bool=true) 
+		       pfunc::Function=macc,nfolds::Int=10,verbose::Bool=true) 
   ## flatten arrays
   @assert size(X)[1] == length(Y)
   rowsize = size(X)[1]
@@ -43,10 +45,11 @@ function crossvalidate(pl::Machine,X::DataFrame,Y::Vector,
       push!(pacc,res)
       fold += 1
       if verbose == true
-	println("fold: ",fold,", ",res)
+        println("fold: ",fold,", ",res)
       end
     catch e
-      #println(e)
+      Base.invokelatest(Base.display_error, Base.catch_stack())
+      @error e
       error += 1
     end
   end
