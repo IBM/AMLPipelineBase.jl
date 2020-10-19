@@ -27,10 +27,6 @@ include("featureselector.jl")
 using .FeatureSelectors
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
-#include("normalizer.jl")
-#using .Normalizers
-#export Normalizer
-
 include("decisiontree.jl")
 using .DecisionTreeLearners
 export PrunedTree, RandomForest, Adaboost
@@ -38,10 +34,6 @@ export PrunedTree, RandomForest, Adaboost
 include("ensemble.jl")
 using .EnsembleMethods
 export VoteEnsemble, StackEnsemble, BestLearner
-
-#include("svm.jl")
-#using .SVMModels
-#export SVMModel, svmlearners
 
 include("crossvalidator.jl")
 using .CrossValidators
