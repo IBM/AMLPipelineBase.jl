@@ -306,4 +306,15 @@ function getprofb()
   return profb
 end
 
+#function getiris_arrow()
+#  iris = Arrow.Table(joinpath(Base.@__DIR__,"../data","iris.arrow")) |> DataFrame
+#  return iris
+#end
+#
+#
+#function getprofb_arrow()
+#  profb = Arrow.Table(joinpath(Base.@__DIR__,"../data","profb.arrow")) |> DataFrame
+#  return profb
+#end
+
 end

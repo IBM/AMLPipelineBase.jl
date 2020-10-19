@@ -28,9 +28,9 @@ function iris_test()
     @test eltype(res[:,6]) <: Number
     catnumdata = hcat(X,repeat([1,2,3,4,5],30))
     catnum = CatNumDiscriminator(5)
-    ppp=@pipeline catnum |> ((catf |> OneHotEncoder()) + (numf |> Normalizer(Dict(:method=>:pca))))
-    res=fit_transform!(ppp,catnumdata)
-    @test ncol(res) == 11
+    #ppp=@pipeline catnum |> ((catf |> OneHotEncoder()) + (numf |> Normalizer(Dict(:method=>:pca))))
+    #res=fit_transform!(ppp,catnumdata)
+    #@test ncol(res) == 11
 end
 @testset "Feature Selectors: Iris" begin
     Random.seed!(123)
@@ -46,10 +46,10 @@ function diabetes_test()
 
     acc(X,Y)=score(:accuracy,X,Y)
 
-    zscore = Normalizer(Dict(:model =>:zscore))
-    unitr  = Normalizer(Dict(:model =>:unitrange))
-    fa     = Normalizer(Dict(:model =>:fa))
-    pca    = Normalizer(Dict(:model =>:pca))
+    #zscore = Normalizer(Dict(:model =>:zscore))
+    #unitr  = Normalizer(Dict(:model =>:unitrange))
+    #fa     = Normalizer(Dict(:model =>:fa))
+    #pca    = Normalizer(Dict(:model =>:pca))
     dt     = PrunedTree()
     ada    = Adaboost()
     rf     = RandomForest()
@@ -57,23 +57,23 @@ function diabetes_test()
     catf   = CatFeatureSelector()
     numf   = NumFeatureSelector()
 
-    disc = CatNumDiscriminator(0)
-    pl = @pipeline disc |> ((numf |>  pca) + (catf |> ohe)) |> rf
-    @test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
+    #disc = CatNumDiscriminator(0)
+    #pl = @pipeline disc |> ((numf |>  pca) + (catf |> ohe)) |> rf
+    #@test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
 
-    pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> ada
-    @test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
+    #pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> ada
+    #@test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
 
-    pl = @pipeline disc |> ((numf |> unitr |>  fa) + (catf |> ohe)) |> dt
-    @test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
+    #pl = @pipeline disc |> ((numf |> unitr |>  fa) + (catf |> ohe)) |> dt
+    #@test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
 
     disc = CatNumDiscriminator(20)
     pl = @pipeline disc |> ( (catf |> ohe)) |> rf
     @test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60
 
-    disc = CatNumDiscriminator(50)
-    pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> rf
-    @test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60
+    #disc = CatNumDiscriminator(50)
+    #pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> rf
+    #@test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60
 end
 @testset "Feature Selectors: Diabetes" begin
     Random.seed!(123)

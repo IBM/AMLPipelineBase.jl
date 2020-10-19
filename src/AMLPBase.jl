@@ -27,9 +27,9 @@ include("featureselector.jl")
 using .FeatureSelectors
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
-include("normalizer.jl")
-using .Normalizers
-export Normalizer
+#include("normalizer.jl")
+#using .Normalizers
+#export Normalizer
 
 include("decisiontree.jl")
 using .DecisionTreeLearners
