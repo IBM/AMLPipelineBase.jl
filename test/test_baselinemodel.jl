@@ -16,7 +16,6 @@ function test_baseline()
     @test sum(transform!(bl,instances) .== repeat(["setosa"],nrow(iris))) == nrow(iris)
     idy = Identity()
     fit!(idy,instances,labels)
-	 @test idy.model == Dict()
     @test (transform!(idy,instances) .== instances) |> Matrix |> sum == 150*4
 end
 @testset "Baseline Tests" begin
