@@ -1,7 +1,7 @@
 module TestDecisionTree
 
 using Test
-using AMLPBase
+using AMLPipelineBase
 using Random
 using DataFrames: nrow, DataFrame
 

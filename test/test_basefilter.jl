@@ -2,7 +2,7 @@ module TestBaseFilter
 
 using Random
 using Test
-using AMLPBase
+using AMLPPipelineBase
 using DataFrames
 
 function test_basefilter()

@@ -2,7 +2,7 @@ module TestEnsembleMethods
 
 using Test
 using Random
-using AMLPBase
+using AMLPipelineBase
 using DataFrames
 
 function generateXY()

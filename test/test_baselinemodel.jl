@@ -3,7 +3,7 @@ module TestBaseline
 using Random
 using Test
 using DataFrames: nrow
-using AMLPBase
+using AMLPipelineBase
 
 function test_baseline()
     Random.seed!(123)

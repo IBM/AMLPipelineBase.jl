@@ -2,7 +2,7 @@ module TestCrossValidator
 
 using Test
 using Random
-using AMLPBase
+using AMLPipelineBase
 
 function test_crossvalidator()
   racc = 50.0

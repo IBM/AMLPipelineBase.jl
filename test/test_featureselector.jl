@@ -5,7 +5,7 @@ using Test
 using CSV
 using Statistics
 using DataFrames
-using AMLPBase
+using AMLPipelineBase
 
 function iris_test()
     X = getiris()

@@ -2,11 +2,11 @@ module TestPipeline
 
 using Random
 using Test
-using AMLPBase
-using AMLPBase.Pipelines
-using AMLPBase.DecisionTreeLearners
-using AMLPBase.CrossValidators
-using AMLPBase.Utils
+using AMLPipelineBase
+using AMLPipelineBase.Pipelines
+using AMLPipelineBase.DecisionTreeLearners
+using AMLPipelineBase.CrossValidators
+using AMLPipelineBase.Utils
 
 const data     = getiris()
 const features = data[:,1:4]

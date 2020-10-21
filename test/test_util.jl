@@ -1,8 +1,8 @@
 module TestUtil
 
 using Test
-using AMLPBase
-using AMLPBase.Utils
+using AMLPipelineBase
+using AMLPipelineBase.Utils
 using DataFrames
 
 

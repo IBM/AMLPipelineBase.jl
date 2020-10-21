@@ -2,7 +2,7 @@ module TestNARemover
 
 using Test
 using Random
-using AMLPBase
+using AMLPipelineBase
 using DataFrames
 
 function test_naremover()
