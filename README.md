@@ -1,24 +1,24 @@
-### AMLPBase.jl
+### AMLPipelineBase.jl
 ---------------
 | **Documentation** | **Build Status** | **Help** |
 |:---:|:---:|:---:|
 | [![][docs-dev-img]][docs-dev-url] [![][docs-stable-img]][docs-stable-url] | [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] | [![][slack-img]][slack-url] [![][gitter-img]][gitter-url] |
 
-[AMLPBase.jl](https://github.com/IBM/AMLPBase.jl) 
+[AMLPipelineBase.jl](https://github.com/IBM/AMLPipelineBase.jl) 
 is the **Base** package of [TSML.jl](https://github.com/IBM/TSML.jl) 
 and [AutoMLPipeline.jl](https://github.com/IBM/AutoMLPipeline.jl).
-**AMLPBase** is written in pure **Julia**. It exposes the abstract 
+**AMLPipelineBase** is written in pure **Julia**. It exposes the abstract 
 types commonly shared by **TSML** and **AutoMLPipeline**.
 It also contains basic data preprocessing routines and 
-learners for rapid prototyping. **TSML** extends **AMLPBase** capability
+learners for rapid prototyping. **TSML** extends **AMLPipelineBase** capability
 by specializing in Time-Series workflow while **AutoMLPipeline**
 focuses in ML pipeline optimization. Since
-**AMLPBase** is written in pure **Julia** including its
+**AMLPipelineBase** is written in pure **Julia** including its
 dependencies, the future target will 
 be to exploit Julia's native multi-threading 
 using thread-safe ML **Julia** libraries for scalability and performance.
 
-**AMLPBase** declares the following abstract data types:
+**AMLPipelineBase** declares the following abstract data types:
 ```julia
 abstract type Machine end
 abstract type Computer    <: Machine  end
@@ -27,7 +27,7 @@ abstract type Learner     <: Computer end
 abstract type Transformer <: Computer end
 ```
 
-**AMLPBase** dynamically dispatches the **fit!** and **transform!**
+**AMLPipelineBase** dynamically dispatches the **fit!** and **transform!**
 functions which must be overloaded by different subtypes of **Machine**.
 ```julia
 function fit!(mc::Machine, input::DataFrame, output::Vector)
@@ -57,7 +57,7 @@ end
     specialized preprocessing routines based on types
 - Normalizers (zscore, unitrange, pca, fa) and Ensemble learners (voting, stacks, best)
 
-### Extending AMLPBase
+### Extending AMLPipelineBase
 If you want to add your own filter/transformer/learner, it is trivial. 
 Just take note that filters and transformers process the first 
 input features and ignores the target output while learners process both 
@@ -71,10 +71,10 @@ to be used for data interchange.
 
 ```
 using DataFrames
-using AMLPBase: AbsTypes, Utils
+using AMLPipelineBase: AbsTypes, Utils
 
 # import fit! and transform! for function overloading 
-import AMLPBase.AbsTypes: fit!, transform!  
+import AMLPipelineBase.AbsTypes: fit!, transform!  
 
 export fit!, transform!, MyFilter
 
@@ -107,14 +107,14 @@ it as part of the pipeline together with the other learners and filters.
 
 ### Installation
 
-AMLPBase is in the Julia Official package registry.
+AMLPipelineBase is in the Julia Official package registry.
 The latest release can be installed at the Julia
 prompt using Julia's package management which is triggered
 by pressing `]` at the julia prompt:
 ```julia
 julia> ]
 pkg> update
-pkg> add AMLPBase
+pkg> add AMLPipelineBase
 ```
 
 Below outlines some typical way to preprocess and model any dataset.
@@ -122,7 +122,7 @@ Below outlines some typical way to preprocess and model any dataset.
 ##### 1. Load Data, Extract Input (X) and Target (Y) 
 ```julia
 # Make sure that the input feature is a dataframe and the target output is a 1-D vector.
-using AMLPBase
+using AMLPipelineBase
 profbdata = getprofb()
 X = profbdata[:,2:end] 
 Y = profbdata[:,1] |> Vector;
@@ -266,7 +266,7 @@ using Distributed
 
 nprocs() == 1 && addprocs()
 @everywhere using DataFrames
-@everywhere using AMLPBase
+@everywhere using AMLPipelineBase
 
 zscore = Normalizer(Dict(:method =>:zscore))
 pca    = Normalizer(Dict(:method =>:pca))
@@ -331,7 +331,7 @@ Pkg.add("AbstractTrees")
 
 # load the packages
 using AbstractTrees
-using AMLPBase
+using AMLPipelineBase
 
 julia> expr = @pipelinex (catf |> ohe) + (numf |> pca) + (numf |> fa) |> rf
 :(Pipeline(ComboPipeline(Pipeline(catf, ohe), Pipeline(numf, pca), Pipeline(numf, fa)), rf))
@@ -369,8 +369,8 @@ Usage questions can be posted in:
 - [Julia Discourse forum][discourse-tag-url]
 
 
-[contrib-url]: https://github.com/IBM/AMLPBase.jl/blob/master/CONTRIBUTORS.md
-[issues-url]: https://github.com/IBM/AMLPBase.jl/issues
+[contrib-url]: https://github.com/IBM/AMLPipelineBase.jl/blob/master/CONTRIBUTORS.md
+[issues-url]: https://github.com/IBM/AMLPipelineBase.jl/issues
 
 [discourse-tag-url]: https://discourse.julialang.org/
 
@@ -382,12 +382,12 @@ Usage questions can be posted in:
 
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://ibm.github.io/AMLPBase.jl/stable/
+[docs-stable-url]: https://ibm.github.io/AMLPipelineBase.jl/stable/
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://ibm.github.io/AMLPBase.jl/dev/
+[docs-dev-url]: https://ibm.github.io/AMLPipelineBase.jl/dev/
 
-[travis-img]: https://travis-ci.com/IBM/AMLPBase.jl.svg?branch=master
-[travis-url]: https://travis-ci.com/IBM/AMLPBase.jl
+[travis-img]: https://travis-ci.com/IBM/AMLPipelineBase.jl.svg?branch=master
+[travis-url]: https://travis-ci.com/IBM/AMLPipelineBase.jl
 
-[codecov-img]: https://codecov.io/gh/IBM/AMLPBase.jl/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/IBM/AMLPBase.jl
+[codecov-img]: https://codecov.io/gh/IBM/AMLPipelineBase.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/IBM/AMLPipelineBase.jl
