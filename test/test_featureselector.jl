@@ -43,34 +43,23 @@ function diabetes_test()
     diabetesdf = CSV.File(joinpath(dirname(pathof(AMLPipelineBase)),"../data/diabetes.csv")) |> DataFrame
     X = diabetesdf[:,1:end-1]
     Y = diabetesdf[:,end] |> Vector
-
     acc(X,Y)=score(:accuracy,X,Y)
-
-    #zscore = Normalizer(Dict(:model =>:zscore))
-    #unitr  = Normalizer(Dict(:model =>:unitrange))
-    #fa     = Normalizer(Dict(:model =>:fa))
-    #pca    = Normalizer(Dict(:model =>:pca))
     dt     = PrunedTree()
     ada    = Adaboost()
     rf     = RandomForest()
     ohe    = OneHotEncoder()
     catf   = CatFeatureSelector()
     numf   = NumFeatureSelector()
-
     #disc = CatNumDiscriminator(0)
     #pl = @pipeline disc |> ((numf |>  pca) + (catf |> ohe)) |> rf
     #@test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
-
     #pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> ada
     #@test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
-
     #pl = @pipeline disc |> ((numf |> unitr |>  fa) + (catf |> ohe)) |> dt
     #@test crossvalidate(pl,X,Y,acc,10,false).mean > 0.60
-
     disc = CatNumDiscriminator(20)
     pl = @pipeline disc |> ( (catf |> ohe)) |> rf
     @test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60
-
     #disc = CatNumDiscriminator(50)
     #pl = @pipeline disc |> ((numf |> zscore |>  pca) + (catf |> ohe)) |> rf
     #@test crossvalidate(pl,X,Y,acc,2,false).mean > 0.60

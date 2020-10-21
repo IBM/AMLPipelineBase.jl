@@ -18,7 +18,9 @@ function test_crossvalidator()
   @test crossvalidate(ppl1,X,Y,acc,10,false).mean > racc
   Random.seed!(123)
   ohe = OneHotEncoder()
-  ppl2 = @pipeline ohe |> rf
+  numf = NumFeatureSelector()
+  catf = CatFeatureSelector()
+  ppl2 = @pipeline (catf |> ohe) + (numf) |> rf
   @test crossvalidate(ppl2,X,Y,acc,10,false).mean > racc
 end
 @testset "CrossValidator" begin

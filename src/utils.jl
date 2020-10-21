@@ -29,24 +29,24 @@ with size of unique instances are less than `maxuniqcat` are
 considered categorical.
 """
 function find_catnum_columns(finstances::DataFrame, maxuniqcat::Int=0)
-  # assume complete cases and remove fields with Union{Missing,Type}
-  instances = identity.(finstances)
-  nominal_columns = Int[]
-  real_columns = Int[]
-  for column in 1:size(instances, 2)
-    vdat = instances[:, column:column] # returns a 1-column dataframe
-    col_eltype = infer_eltype(vdat)
-    # nominal if column type is not real or only small number of unique instances 
-    # otherwise, real
-    if  !<:(col_eltype, Real)
-      push!(nominal_columns, column)
-    elseif nrow(unique(vdat)) <= maxuniqcat
-      push!(nominal_columns, column)
-    else
-      push!(real_columns, column)
-    end
-  end
-  return (nominal_columns,real_columns)
+   # assume complete cases and remove fields with Union{Missing,Type}
+   instances = identity.(finstances)
+   nominal_columns = Int[]
+   real_columns = Int[]
+   for column in 1:size(instances, 2)
+      vdat = instances[:, column:column] # returns a 1-column dataframe
+      col_eltype = infer_eltype(vdat)
+      # nominal if column type is not real or only small number of unique instances 
+      # otherwise, real
+      if  !<:(col_eltype, Real)
+         push!(nominal_columns, column)
+      elseif nrow(unique(vdat)) <= maxuniqcat
+         push!(nominal_columns, column)
+      else
+         push!(real_columns, column)
+      end
+   end
+   return (nominal_columns,real_columns)
 end
 
 """
@@ -61,11 +61,11 @@ into two partitions.
 Returns: two partitions of indices, left and right
 """
 function holdout(n, right_prop)
-  shuffled_indices = randperm(n)
-  partition_pivot = round(Int,right_prop * n)
-  right = shuffled_indices[1:partition_pivot]
-  left = shuffled_indices[partition_pivot+1:end]
-  return (left, right)
+   shuffled_indices = randperm(n)
+   partition_pivot = round(Int,right_prop * n)
+   right = shuffled_indices[1:partition_pivot]
+   left = shuffled_indices[partition_pivot+1:end]
+   return (left, right)
 end
 
 """
@@ -79,7 +79,7 @@ Returns k-fold partitions.
 Returns: training set partition.
 """
 function kfold(num_instances, num_partitions)
-  return collect(Kfold(num_instances, num_partitions))
+   return collect(Kfold(num_instances, num_partitions))
 end
 
 """
@@ -97,11 +97,17 @@ Available metrics:
 Returns: score of learner
 """
 function score(metric::Symbol, actual::Vector, predicted::Vector)
-  if metric == :accuracy
-    mean(actual .== predicted) * 100.0
-  else
-    error("Metric $metric not implemented for score.")
-  end
+   if metric == :accuracy
+      return mean(actual .== predicted) * 100.0
+   elseif metric == :mae
+      return mean(abs2.(actual .- predicted))
+   elseif metric == :mse
+      return mean((actual .- predicted).^2)
+   elseif metric == :rmse
+      return sqrt(mean((actual .- predicted).^2))
+   else
+      throw(ArgumentError("Metric $metric not implemented for score."))
+   end
 end
 
 """
@@ -116,47 +122,47 @@ inferred from the vector elements.
 Returns: inferred element type
 """
 function infer_eltype(vector::Vector)
-  # Obtain element type of vector
-  vec_eltype = eltype(vector)
+   # Obtain element type of vector
+   vec_eltype = eltype(vector)
 
-  # If element type of Vector is Any and not empty,
-  # and all elements are of the same type,
-  # then return the vector elements' type.
-  if vec_eltype == Any && !isempty(vector)
-    all_elements_same_type = all(x -> typeof(x) == typeof(first(vector)), vector)
-    if all_elements_same_type
-      vec_eltype = typeof(first(vector))
-    end
-  end
+   # If element type of Vector is Any and not empty,
+   # and all elements are of the same type,
+   # then return the vector elements' type.
+   if vec_eltype == Any && !isempty(vector)
+      all_elements_same_type = all(x -> typeof(x) == typeof(first(vector)), vector)
+      if all_elements_same_type
+         vec_eltype = typeof(first(vector))
+      end
+   end
 
-  # Return inferred element type
-  return vec_eltype
+   # Return inferred element type
+   return vec_eltype
 end
 
 function infer_eltype(df::DataFrame)
-  infer_eltype(Matrix(df))
+   infer_eltype(Matrix(df))
 end
 
 function infer_eltype(pd::PooledArray)
-  infer_eltype(collect(pd))
+   infer_eltype(collect(pd))
 end
 
 function infer_eltype(mtrx::Matrix)
-  # Obtain element type of matrix
-  mat_eltype = eltype(mtrx)
+   # Obtain element type of matrix
+   mat_eltype = eltype(mtrx)
 
-  # If element type of Matrix is Any and not empty,
-  # and all elements are of the same type,
-  # then return the matrix elements' type.
-  if mat_eltype == Any && !isempty(mtrx)
-    all_elements_same_type = all(x -> typeof(x) == typeof(first(mtrx)), mtrx)
-    if all_elements_same_type
-      mat_eltype = typeof(first(mtrx))
-    end
-  end
+   # If element type of Matrix is Any and not empty,
+   # and all elements are of the same type,
+   # then return the matrix elements' type.
+   if mat_eltype == Any && !isempty(mtrx)
+      all_elements_same_type = all(x -> typeof(x) == typeof(first(mtrx)), mtrx)
+      if all_elements_same_type
+         mat_eltype = typeof(first(mtrx))
+      end
+   end
 
-  # Return inferred element type
-  return mat_eltype
+   # Return inferred element type
+   return mat_eltype
 end
 
 """
@@ -169,20 +175,20 @@ Converts nested dictionary to list of tuples
 Returns: list where elements are ([outer-key, inner-key, ...], value)
 """
 function nested_dict_to_tuples(dict::Dict)
-  set = Set()
-  for (entry_id, entry_val) in dict
-    if typeof(entry_val) <: Dict
-      inner_set = nested_dict_to_tuples(entry_val)
-      for (inner_entry_id, inner_entry_val) in inner_set
-        new_entry = (vcat([entry_id], inner_entry_id), inner_entry_val)
-        push!(set, new_entry)
+   set = Set()
+   for (entry_id, entry_val) in dict
+      if typeof(entry_val) <: Dict
+         inner_set = nested_dict_to_tuples(entry_val)
+         for (inner_entry_id, inner_entry_val) in inner_set
+            new_entry = (vcat([entry_id], inner_entry_id), inner_entry_val)
+            push!(set, new_entry)
+         end
+      else
+         new_entry = ([entry_id], entry_val)
+         push!(set, new_entry)
       end
-    else
-      new_entry = ([entry_id], entry_val)
-      push!(set, new_entry)
-    end
-  end
-  return set
+   end
+   return set
 end
 
 """
@@ -195,11 +201,11 @@ Set value in a nested dictionary.
 - `value`: value to assign
 """
 function nested_dict_set!(dict::Dict, keys::Array{T, 1}, value) where {T}
-  inner_dict = dict
-  for key in keys[1:end-1]
-    inner_dict = inner_dict[key]
-  end
-  inner_dict[keys[end]] = value
+   inner_dict = dict
+   for key in keys[1:end-1]
+      inner_dict = inner_dict[key]
+   end
+   inner_dict[keys[end]] = value
 end
 
 """
@@ -218,18 +224,18 @@ Otherwise the second's value overrides the first.
 Returns: merged nested dictionary
 """
 function nested_dict_merge(first::Dict, second::Dict)
-  target = copy(first)
-  for (second_key, second_value) in second
-    values_both_dict =
+   target = copy(first)
+   for (second_key, second_value) in second
+      values_both_dict =
       typeof(second_value) <: Dict &&
       typeof(get(target, second_key, nothing)) <: Dict
-    if values_both_dict
-      target[second_key] = nested_dict_merge(target[second_key], second_value)
-    else
-      target[second_key] = second_value
-    end
-  end
-  return target
+      if values_both_dict
+         target[second_key] = nested_dict_merge(target[second_key], second_value)
+      else
+         target[second_key] = second_value
+      end
+   end
+   return target
 end
 
 mergedict = nested_dict_merge
@@ -246,13 +252,13 @@ Create machine
 Returns: new machine
 """
 function createmachine(prototype::Machine, args::Dict=Dict())
-  new_args = copy(prototype.args)
-  if args != Dict() # if not empty Dict, merge 
-    new_args = nested_dict_merge(new_args, args)
-  end
+   new_args = copy(prototype.model)
+   if args != Dict()
+      new_args = nested_dict_merge(new_args, args)
+   end
 
-  prototype_type = typeof(prototype)
-  return prototype_type(new_args)
+   prototype_type = typeof(prototype)
+   return prototype_type(new_args)
 end
 
 """
@@ -261,58 +267,57 @@ end
 Function to create aggregator closure with skipmissing features
 """
 function aggregatorclskipmissing(fn::Function)
-  function skipagg(x::Union{AbstractArray,DataFrame})
-    if length(collect(skipmissing(x))) == 0
-      return missing
-    else
-      return fn(skipmissing(x))
-    end
-  end
-  return skipagg
+   function skipagg(x::Union{AbstractArray,DataFrame})
+      if length(collect(skipmissing(x))) == 0
+         return missing
+      else
+         return fn(skipmissing(x))
+      end
+   end
+   return skipagg
 end
 
 
 function skipmean(x::T) where {T<:Union{AbstractArray,DataFrame}} 
-  if length(collect(skipmissing(x))) == 0
-    missing
-  else
-    mean(skipmissing(x))
-  end
+   if length(collect(skipmissing(x))) == 0
+      missing
+   else
+      mean(skipmissing(x))
+   end
 end
 
 function skipmedian(x::T) where {T<:Union{AbstractArray,DataFrame}} 
-  if length(collect(skipmissing(x))) == 0
-    missing
-  else
-    median(skipmissing(x))
-  end
+   if length(collect(skipmissing(x))) == 0
+      missing
+   else
+      median(skipmissing(x))
+   end
 end
 
 function skipstd(x::T) where {T<:Union{AbstractArray,DataFrame}} 
-  if length(collect(skipmissing(x))) == 0
-    missing
-  else
-    std(skipmissing(x))
-  end
+   if length(collect(skipmissing(x))) == 0
+      missing
+   else
+      std(skipmissing(x))
+   end
 end
 
 function getiris()
-  iris = CSV.File(joinpath(Base.@__DIR__,"../data","iris.csv")) |> DataFrame
-  return iris
+   iris = CSV.File(joinpath(Base.@__DIR__,"../data","iris.csv")) |> DataFrame
+   return iris
 end
 
 function getprofb()
-  profb = CSV.File(joinpath(Base.@__DIR__,"../data","profb.csv")) |> DataFrame
-  return profb
+   profb = CSV.File(joinpath(Base.@__DIR__,"../data","profb.csv")) |> DataFrame
+   return profb
 end
 
-#function getiris_arrow()
+#function getiris()
 #  iris = Arrow.Table(joinpath(Base.@__DIR__,"../data","iris.arrow")) |> DataFrame
 #  return iris
 #end
 #
-#
-#function getprofb_arrow()
+#function getprofb()
 #  profb = Arrow.Table(joinpath(Base.@__DIR__,"../data","profb.arrow")) |> DataFrame
 #  return profb
 #end

@@ -4,6 +4,7 @@ using Test
 using AMLPipelineBase
 using AMLPipelineBase.Utils
 using DataFrames
+using Random
 
 
 function test_utils()
@@ -42,5 +43,38 @@ end
 @testset "Utils" begin
   test_utils()
 end
+
+
+function test_metric()
+   data = getiris()
+   X=data[:,2:end]
+   Y=data[:,1] |> collect
+   rf = RandomForest()
+   catf = CatFeatureSelector()
+   numf = NumFeatureSelector()
+   ohe = OneHotEncoder()
+
+   pl = @pipeline (catf |> ohe) + (numf) |> rf
+
+   rmse(X,Y) = score(:rmse,X,Y)
+   @test crossvalidate(pl,X,Y,rmse,10,false).mean < 0.5
+   @test crossvalidate(pl,X,Y;metric=rmse,verbose=false).mean < 0.5
+
+   mse(X,Y) = score(:mse,X,Y)
+   @test crossvalidate(pl,X,Y,mse,10,false).mean < 0.2
+   @test crossvalidate(pl,X,Y;metric=mse,verbose=false).mean < 0.2
+
+   mae(X,Y) = score(:mae,X,Y)
+   @test crossvalidate(pl,X,Y,mae,10,false).mean < 0.2
+   @test crossvalidate(pl,X,Y;metric=mae,verbose=false).mean < 0.2
+
+   rmse(X,Y) = score(:rmse,X,Y)
+   @test crossvalidate(pl,X,Y,mae,10,false).mean < 0.2
+   @test crossvalidate(pl,X,Y;metric=mae,verbose=false).mean < 0.2
+end
+@testset "Utils Metrics" begin
+  test_metric()
+end
+
 
 end
