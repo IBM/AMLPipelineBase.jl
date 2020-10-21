@@ -40,7 +40,7 @@ end
 
 function diabetes_test()
     Random.seed!(123)
-    diabetesdf = CSV.File(joinpath(dirname(pathof(AMLPBase)),"../data/diabetes.csv")) |> DataFrame
+    diabetesdf = CSV.File(joinpath(dirname(pathof(AMLPipelineBase)),"../data/diabetes.csv")) |> DataFrame
     X = diabetesdf[:,1:end-1]
     Y = diabetesdf[:,end] |> Vector
 
