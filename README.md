@@ -61,28 +61,29 @@ end
 If you want to add your own filter/transformer/learner, it is trivial. 
 Just take note that filters and transformers process the first 
 input features and ignores the target output while learners process both 
-the input features and target output arguments of the **fit!** function. 
-The **transform!** function always expect one input argument in all cases. 
+the input features and target output arguments of the `fit!` function. 
+The `transform!` function always expect one input argument in all cases. 
 
 First, import the abstract types and define your own mutable structure 
-as subtype of either Learner or Transformer. Also import the **fit!** and
-**transform!** functions to be overloaded. Also load the DataFrames package
+as subtype of either Learner or Transformer. Next, import the `fit!` and
+`transform!` functions to be overloaded. Also, load the DataFrames package
 to be used for data interchange.
 
-```
+```julia
 using DataFrames
-using AMLPipelineBase: AbsTypes, Utils
+using AMLPipelineBase: AbsTypes
 
 # import fit! and transform! for function overloading 
 import AMLPipelineBase.AbsTypes: fit!, transform!  
 
+# export new definitions for dynamic dispatch
 export fit!, transform!, MyFilter
 
 # define your filter structure
 mutable struct MyFilter <: Transformer
   name::String
   model::Dict
-  args::Dict
+
   function MyFilter(args::Dict())
       ....
   end
