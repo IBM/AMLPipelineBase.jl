@@ -14,7 +14,6 @@ notifications:
 jobs:
   allow_failures:
     - julia: nightly
-    - os: windows
 
 after_success:
   - if [[ $TRAVIS_OS_NAME = linux ]]; then
