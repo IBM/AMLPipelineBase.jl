@@ -21,7 +21,12 @@ function test_crossvalidator()
   numf = NumFeatureSelector()
   catf = CatFeatureSelector()
   ppl2 = @pipeline (catf |> ohe) + (numf) |> rf
-  @test crossvalidate(ppl2,X,Y,acc,10,false).mean > racc
+  @test crossvalidate(ppl2,X,Y,acc).mean > racc
+  @test crossvalidate(ppl2,X,Y,acc,5).mean > racc
+  @test crossvalidate(ppl2,X,Y,acc,5,false).mean > racc
+  @test crossvalidate(ppl2,X,Y,metric=acc).mean > racc
+  @test crossvalidate(ppl2,X,Y,metric=acc,verbose=false).mean > racc
+  @test crossvalidate(ppl2,X,Y,metric=acc,nfolds=5).mean > racc
 end
 @testset "CrossValidator" begin
   test_crossvalidator()
