@@ -53,6 +53,10 @@ mutable struct VoteEnsemble <: Learner
   end
 end
 
+function VoteEnsemble(learners::Vector{<:Learner}, opt::Dict)
+   VoteEnsemble(Dict(:learners => learners, opt...))
+end
+
 function VoteEnsemble(learners::Vector{<:Learner}; opt...)
    VoteEnsemble(Dict(:learners => learners, Dict(pairs(opt))...))
 end
@@ -132,6 +136,10 @@ mutable struct StackEnsemble <: Learner
     cargs[:name] = cargs[:name]*"_"*randstring(3)
     new(cargs[:name],cargs)
   end
+end
+
+function StackEnsemble(learners::Vector{<:Learner}, opt::Dict)
+   StackEnsemble(Dict(:learners => learners, opt...))
 end
 
 function StackEnsemble(learners::Vector{<:Learner}; opt...)
@@ -298,6 +306,11 @@ mutable struct BestLearner <: Learner
     cargs[:name] = cargs[:name]*"_"*randstring(3)
     new(cargs[:name],cargs)
   end
+end
+
+
+function BestLearner(learners::Vector{<:Learner}, opt::Dict)
+   BestLearner(Dict(:learners => learners, opt...))
 end
 
 function BestLearner(learners::Vector{<:Learner}; opt...)
