@@ -133,14 +133,6 @@ head(profbdata)
 
 #### 2. Load Filters, Transformers, and Learners 
 ```julia
-#### Decomposition
-pca = Normalizer(:pca)
-fa  = Normalizer(:fa)
-
-#### Scaler 
-zscore = Normalizer(:zscore)
-unitr  = Normalizer(:unitrange);
-
 #### categorical preprocessing
 ohe = OneHotEncoder()
 
@@ -163,18 +155,10 @@ pohe = @pipeline catf |> ohe
 tr = fit_transform!(pohe,X,Y)
 ```
 
-#### 4. Numerical Feature Extraction Example 
-
-##### 4.1 Filter numeric features, scale with zscore, extract fa and pca features, and combine both features
+#### 4. Filter numeric features
 ```julia
-pdec = @pipeline numf |> zscore |> (fa + pca)
+pdec = @pipeline numf 
 tr = fit_transform!(pdec,X,Y)
-```
-
-##### 4.2 Filter numeric features, transform to robust and power transform scaling, perform ica and pca, respectively, and combine both
-```julia
-ppt = @pipeline numf |> (( zscore |> fa) + (unitr |> pca))
-tr = fit_transform!(ppt,X,Y)
 ```
 
 #### 5. A Pipeline for the Voting Ensemble Classification
@@ -206,7 +190,7 @@ julia> @macroexpand @pipeline (catf |> ohe) + (numf) |> vote
 # compute the pca, ica, fa of the numerical columns,
 # combine them with the hot-bit encoded categorical features
 # and feed all to the random forest classifier
-prf = @pipeline (catf|> ohe) + (numf |> ((zscore |> fa) + (unitr |> pca) + (zscore |> pca)))  |> rf
+prf = @pipeline (catf|> ohe) + numf   |> rf
 pred = fit_transform!(prf,X,Y)
 score(:accuracy,pred,Y) |> println
 crossvalidate(prf,X,Y,acc,10)
@@ -236,8 +220,6 @@ using Random
 using DataFrames
 Random.seed!(1)
 
-zscore = Normalizer(Dict(:method =>:zscore))
-pca    = Normalizer(Dict(:method =>:pca))
 disc   = CatNumDiscriminator()
 catf   = CatFeatureSelector()
 numf   = NumFeatureSelector()
@@ -251,7 +233,7 @@ vote   = VoteEnsemble()
 
 learners = DataFrame()
 for learner in [rf,ada,tree,stack,vote,best]
-    pcmc = @pipeline disc |> ((catf |> ohe) + (numf |> zscore |> pca)) |> learner
+    pcmc = @pipeline disc |> ((catf |> ohe) + numf) |> learner
     println(learner.name)
     mean,sd,_ = crossvalidate(pcmc,X,Y,acc,10,true)
     learners = vcat(learners,DataFrame(name=learner.name,mean=mean,sd=sd))
@@ -269,8 +251,6 @@ nprocs() == 1 && addprocs()
 @everywhere using DataFrames
 @everywhere using AMLPipelineBase
 
-zscore = Normalizer(Dict(:method =>:zscore))
-pca    = Normalizer(Dict(:method =>:pca))
 rf     = RandomForest()
 ada    = Adaboost()
 tree   = PrunedTree()
@@ -284,7 +264,7 @@ numf   = NumFeatureSelector()
 @everywhere acc(X,Y) = score(:accuracy,X,Y)
 
 learners = @distributed (vcat) for learner in [rf,ada,tree,stack,vote,best]
-    pcmc = @pipeline disc |> ((catf |> ohe) + (numf |> zscore |> pca)) |> learner
+    pcmc = @pipeline disc |> ((catf |> ohe) + (numf)) |> learner
     println(learner.name)
     mean,sd,_ = crossvalidate(pcmc,X,Y,acc,10,true)
     DataFrame(name=learner.name,mean=mean,sd=sd)
@@ -298,7 +278,7 @@ If we use the same pre-processing pipeline in 10, we expect that the average per
 best learner which is `lsvc` will be around 73.0.
 ```julia
 Random.seed!(1)
-pcmc = @pipeline disc |> ((catf |> ohe) + (numf |> zscore)) |> (rf * ada * tree)
+pcmc = @pipeline disc |> ((catf |> ohe) + (numf)) |> (rf * ada * tree)
 crossvalidate(pcmc,X,Y,acc,10,true)
 ```
 
@@ -308,7 +288,9 @@ as transformers and their outputs become inputs to the final learner as illustra
 below.
 ```julia
 expr = @pipeline ( 
-                   ((numf |> zscore)+(catf |> ohe) |> ada) + ((numf |> zscore)+(catf |> ohe) |> rf) 
+                   ((numf)+(catf |> ohe) |> rf) +
+                   ((numf)+(catf |> ohe) |> ada) +
+                   ((numf)+(catf |> ohe) |> tree) 
                  ) |> ohe |> rf;                
 crossvalidate(expr,X,Y,acc,10,true)
 ```
@@ -334,29 +316,21 @@ Pkg.add("AbstractTrees")
 using AbstractTrees
 using AMLPipelineBase
 
-julia> expr = @pipelinex (catf |> ohe) + (numf |> pca) + (numf |> fa) |> rf
-:(Pipeline(ComboPipeline(Pipeline(catf, ohe), Pipeline(numf, pca), Pipeline(numf, fa)), rf))
+julia> expr = @pipelinex (catf |> ohe) + (numf) |> rf
+:(Pipeline(ComboPipeline(Pipeline(catf, ohe), numf), rf))
 
 julia> print_tree(stdout, expr)
-:(Pipeline(ComboPipeline(Pipeline(catf, ohe), Pipeline(numf, pca), Pipeline(numf, ica)), rf))
+:(Pipeline(ComboPipeline(Pipeline(catf, ohe), numf), rf))
 ├─ :Pipeline
-├─ :(ComboPipeline(Pipeline(catf, ohe), Pipeline(numf, pca), Pipeline(numf, ica)))
+├─ :(ComboPipeline(Pipeline(catf, ohe), numf))
 │  ├─ :ComboPipeline
 │  ├─ :(Pipeline(catf, ohe))
 │  │  ├─ :Pipeline
 │  │  ├─ :catf
 │  │  └─ :ohe
-│  ├─ :(Pipeline(numf, pca))
-│  │  ├─ :Pipeline
-│  │  ├─ :numf
-│  │  └─ :pca
-│  └─ :(Pipeline(numf, ica))
-│     ├─ :Pipeline
-│     ├─ :numf
-│     └─ :ica
+│  └─ :numf
 └─ :rf
 ```
-
 
 ### Feature Requests and Contributions
 
@@ -380,7 +354,6 @@ Usage questions can be posted in:
 
 [slack-img]: https://img.shields.io/badge/chat-on%20slack-yellow.svg
 [slack-url]: https://julialang.slack.com/
-
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://ibm.github.io/AutoMLPipeline.jl/stable/
