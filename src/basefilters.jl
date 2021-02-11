@@ -108,7 +108,7 @@ function transform!(ohe::OneHotEncoder, pinstances::DataFrame)
     end
   end
 
-  return transformed_instances |> DataFrame
+  return transformed_instances |> x -> DataFrame(x,:auto)
 end
 
 
@@ -157,16 +157,21 @@ function transform!(imp::Imputer, myinstances::DataFrame)
   for column in 1:size(myinstances, 2)
     column_values = myinstances[:, column]
     col_eltype = infer_eltype(column_values)
-
-    if <:(col_eltype, Real)
-      na_rows = map(x -> isnan(x), column_values)
-      if any(na_rows)
-        fill_value = strategy(column_values[.!na_rows])
-        new_instances[na_rows, column] .= fill_value
-      end
+    if <:(col_eltype, Union{Missing,Integer})
+       mss_rows = map(x -> ismissing(x), column_values)
+       if any(mss_rows)
+          fill_value = strategy(column_values[.!mss_rows]) |> round |> Integer
+          new_instances[mss_rows, column] .= fill_value
+       end
+    elseif <:(col_eltype, Union{Missing,Real})
+       mss_rows = map(x -> ismissing(x), column_values)
+       if any(mss_rows)
+          fill_value = strategy(column_values[.!mss_rows])
+          new_instances[mss_rows, column] .= fill_value
+       end
     end
   end
-  return new_instances |> DataFrame
+  return new_instances 
 end
 
 """
