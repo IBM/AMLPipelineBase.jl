@@ -68,7 +68,6 @@ function test_metric()
    @test crossvalidate(pl,X,Y,mae,10,false).mean < 0.2
    @test crossvalidate(pl,X,Y;metric=mae,verbose=false).mean < 0.2
 
-   rmse(X,Y) = score(:rmse,X,Y)
    @test crossvalidate(pl,X,Y,mae,10,false).mean < 0.2
    @test crossvalidate(pl,X,Y;metric=mae,verbose=false).mean < 0.2
 end
