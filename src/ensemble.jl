@@ -192,7 +192,7 @@ function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)
   stacker = se.model[:stacker]
   keep_original_features = se.model[:keep_original_features]
   stacker_instances = build_stacker_instances(learners, stack_instances, 
-                      label_map, keep_original_features) |> DataFrame
+                                              label_map, keep_original_features) |> x->DataFrame(x,:auto)
   fit!(stacker, stacker_instances, stack_labels)
   
   # Build model
@@ -214,7 +214,7 @@ function transform!(se::StackEnsemble, instances::DataFrame)
   label_map = se.model[:label_map]
   keep_original_features = se.model[:keep_original_features]
   stacker_instances = build_stacker_instances(learners, instances, 
-                      label_map, keep_original_features) |> DataFrame
+                                              label_map, keep_original_features) |> x-> DataFrame(x,:auto)
 
   # Predict
   return transform!(stacker, stacker_instances)

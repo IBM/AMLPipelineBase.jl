@@ -303,22 +303,22 @@ function skipstd(x::T) where {T<:Union{AbstractArray,DataFrame}}
 end
 
 function getiris()
-   iris = CSV.File(joinpath(Base.@__DIR__,"../data","iris.csv")) |> DataFrame
+   iris = CSV.read(joinpath(Base.@__DIR__,"../data","iris.csv"),DataFrame) 
    return iris
 end
 
 function getprofb()
-   profb = CSV.File(joinpath(Base.@__DIR__,"../data","profb.csv")) |> DataFrame
+   profb = CSV.read(joinpath(Base.@__DIR__,"../data","profb.csv"),DataFrame)
    return profb
 end
 
 #function getiris()
-#  iris = Arrow.Table(joinpath(Base.@__DIR__,"../data","iris.arrow")) |> DataFrame
+#  iris = Arrow.Table(joinpath(Base.@__DIR__,"../data","iris.arrow")) 
 #  return iris
 #end
 #
 #function getprofb()
-#  profb = Arrow.Table(joinpath(Base.@__DIR__,"../data","profb.arrow")) |> DataFrame
+#  profb = Arrow.Table(joinpath(Base.@__DIR__,"../data","profb.arrow"))
 #  return profb
 #end
 
