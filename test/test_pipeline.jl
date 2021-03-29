@@ -32,17 +32,21 @@ function test_pipeline()
   combo1 = ComboPipeline([ohe,ohe])
   combo2 = ComboPipeline([linear1,linear2])
   # test fit/transform workflow
-  fit!(combo1,X)
-  res1=transform!(combo1,X)
-  res2=fit_transform!(combo1,X)
+  res1 = fit_transform!(combo1,X)
+  res2 = fit_transform!(combo2,X)
   @test (res1 .== res2) |> Matrix |> sum == 2100
-  fit!(combo2,X)
   res3=transform!(combo2,X)
   res4=fit_transform!(combo2,X)
   @test (res3 .== res4) |> Matrix |> sum == 2100
   pcombo1 = @pipeline ohe + ohe
   pres1 = fit_transform!(pcombo1,X)
   @test (pres1 .== res1) |> Matrix |> sum == 2100
+  combo3 = ohe + ohe
+  combo5 = linear1 + linear2
+  res5 = fit_transform!(combo3,X)
+  @test (res5 .== res2) |> Matrix |> sum == 2100
+  res6 = fit_transform!(combo5,X)
+  @test (res6 .== res2) |> Matrix |> sum == 2100
 end
 @testset "Pipelines" begin
   Random.seed!(123)
@@ -53,7 +57,9 @@ acc(X,Y) = score(:accuracy,X,Y)
 
 function test_sympipeline()
   pcombo5 = @pipeline :((ohe + noop) |> (ada * rf * pt))
+  pcombo6 = (ohe + noop) |> (ada * rf * pt)
   @test crossvalidate(pcombo5,X,Y,acc,5,false).mean >= 0.90
+  @test crossvalidate(pcombo6,X,Y,acc,5,false).mean >= 0.90
   expr = :((ohe + noop) |> (ada * rf * pt))
   processexpr!(expr.args)
   @test crossvalidate(eval(expr),X,Y,acc,5,false).mean >= 0.90
@@ -70,9 +76,13 @@ end
 function test_pipeline()
   # test symbolic pipeline expression 
   pcombo2 = @pipeline ohe + noop
+  pcombo3 = ohe + noop
   @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
-  pcombo2 = @pipeline ohe + noop |> rf
-  @test crossvalidate(pcombo2,X,Y,acc,5,false).mean >= 0.90
+  @test fit_transform!(pcombo3,features) |> Matrix |> size |> collect |> sum == 158
+  pcombo4 = @pipeline ohe + noop |> rf
+  pcombo5 = (ohe + noop) |> rf
+  @test crossvalidate(pcombo4,X,Y,acc,5,false).mean >= 0.90
+  @test crossvalidate(pcombo5,X,Y,acc,5,false).mean >= 0.90
 end
 @testset "Symbolic Pipeline: Local Scope" begin
   Random.seed!(123)

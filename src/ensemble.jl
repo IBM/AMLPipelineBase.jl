@@ -317,7 +317,7 @@ function BestLearner(learners::Vector{<:Learner}; opt...)
    BestLearner(Dict(:learners => learners, Dict(pairs(opt))...))
 end
 
-function BestLearner(learners::Vararg{Learner})
+function BestLearner(learners::Vararg{<:Learner})
    (eltype(learners) <: Learner) || throw(ArgumentError("argument setup error"))
    v=[x for x in learners] # convert tuples to vector
    BestLearner(v)

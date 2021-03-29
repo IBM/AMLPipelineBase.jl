@@ -18,7 +18,7 @@ Generic trait to be overloaded by different subtypes of Machine.
 Multiple dispatch for fit!.
 """
 function fit!(mc::Machine, input::DataFrame, output::Vector)
-   throw(ArgumentError(typeof(mc),"not implemented"))
+   throw(ArgumentError(typeof(mc)," not implemented"))
 end
 
 
@@ -29,7 +29,7 @@ Generic trait to be overloaded by different subtypes of Machine.
 Multiple dispatch for transform!.
 """
 function transform!(mc::Machine, input::DataFrame)
-   throw(ArgumentError(typeof(mc),"not implemented"))
+   throw(ArgumentError(typeof(mc)," not implemented"))
 end
 
 
