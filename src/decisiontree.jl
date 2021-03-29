@@ -80,7 +80,7 @@ end
 Optimize the hyperparameters of `PrunedTree` instance.
 """
 function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector) 
-  instances=convert(Matrix,features)
+  instances=Matrix(features)
   args = ptree.model[:impl_args]
   btreemodel = DT.build_tree(
     labels,
@@ -102,7 +102,7 @@ end
 Predict using the optimized hyperparameters of the trained `PrunedTree` instance.
 """
 function transform!(ptree::PrunedTree, features::DataFrame)
-  instances=convert(Matrix,features)
+  instances=Matrix(features)
   model = ptree.model[:dtmodel]
   return DT.apply_tree(model, instances)
 end
@@ -168,12 +168,12 @@ function RandomForest(name::String;opt...)
 end
 
 """
-    fit!(forest::RandomForest, features::T, labels::Vector) where {T<:Union{Vector,Matrix,DataFrame}}
+    fit!(forest::RandomForest, features::DataFrame, labels::Vector) 
 
 Optimize the parameters of the `RandomForest` instance.
 """
 function fit!(forest::RandomForest, features::DataFrame, labels::Vector) 
-  instances=convert(Matrix,features)
+  instances=Matrix(features)
   # Set training-dependent options
   impl_args = forest.model[:impl_args]
   # Build model
@@ -191,14 +191,14 @@ end
 
 
 """
-    transform!(forest::RandomForest, features::T) where {T<:Union{Vector,Matrix,DataFrame}}
+    transform!(forest::RandomForest, features::DataFrame) 
 
 
 Predict using the optimized hyperparameters of the trained `RandomForest` instance.
 """
 function transform!(forest::RandomForest, features::DataFrame)
   instances = features
-  instances=convert(Matrix,features)
+  instances = Matrix(features)
   model = forest.model[:dtmodel]
   return DT.apply_forest(model, instances)
 end
@@ -254,7 +254,7 @@ end
 Optimize the hyperparameters of `Adaboost` instance.
 """
 function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector) 
-  instances = convert(Matrix,features)
+  instances = Matrix(features)
   # NOTE(svs14): Variable 'model' renamed to 'ensemble'.
   #              This differs to DecisionTree
   #              official documentation to avoid confusion in variable
@@ -267,12 +267,12 @@ function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector)
 end
 
 """
-    transform!(adaboost::Adaboost, features::T) where {T<:Union{Vector,Matrix,DataFrame}}
+    transform!(adaboost::Adaboost, features::DataFrame)
 
 Predict using the optimized hyperparameters of the trained `Adaboost` instance.
 """
-function transform!(adaboost::Adaboost, features::DataFrame)::Vector{<:Any}
-  instances = convert(Matrix,features)
+function transform!(adaboost::Adaboost, features::DataFrame)
+  instances = Matrix(features)
   return DT.apply_adaboost_stumps(
     adaboost.model[:ensemble], adaboost.model[:coefficients], instances
   )
