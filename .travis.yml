@@ -8,17 +8,13 @@ julia:
   - 1.6
   - nightly
 
-# blocklist
-branches:
-   except:
-      - experimental
-
-# safelist
 branches:
    only:
       - master
       - main
       - stable
+   except:
+      - experimental
 
 notifications:
   email: false
