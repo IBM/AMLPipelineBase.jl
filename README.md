@@ -360,8 +360,8 @@ Usage questions can be posted in:
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://ibm.github.io/AutoMLPipeline.jl/dev/
 
-[travis-img]: https://travis-ci.com/IBM/AMLPipelineBase.jl.svg?branch=master
-[travis-url]: https://travis-ci.com/IBM/AMLPipelineBase.jl
+[travis-img]: https://github.com/IBM/AMLPipelineBase.jl/actions/workflows/ci.yml/badge.svg
+[travis-url]: https://github.com/IBM/AMLPipelineBase.jl/actions/workflows/ci.yml
 
 [codecov-img]: https://codecov.io/gh/IBM/AMLPipelineBase.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/IBM/AMLPipelineBase.jl
