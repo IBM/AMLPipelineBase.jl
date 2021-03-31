@@ -152,13 +152,13 @@ vote  = VoteEnsemble()
 #### 3. Filter categories and hot-encode them
 ```julia
 pohe = catf |> ohe
-tr = fit_transform!(pohe,X,Y)
+tr   = fit_transform!(pohe,X,Y)
 ```
 
 #### 4. Filter numeric features
 ```julia
-pdec = numf 
-tr = fit_transform!(pdec,X,Y)
+pdec = numf
+tr   = fit_transform!(pdec,X,Y)
 ```
 
 #### 5. A Pipeline for the Voting Ensemble Classification
@@ -167,8 +167,8 @@ tr = fit_transform!(pdec,X,Y)
 # concatenate them to the numerical features,
 # and feed them to the voting ensemble
 pvote = (catf |> ohe) + (numf) |> vote
-pred = fit_transform!(pvote,X,Y)
-sc=score(:accuracy,pred,Y)
+pred  = fit_transform!(pvote,X,Y)
+sc    = score(:accuracy,pred,Y)
 println(sc)
 ### cross-validate
 acc(X,Y) = score(:accuracy,X,Y)
@@ -190,7 +190,7 @@ julia> @macroexpand @pipeline (catf |> ohe) + (numf) |> vote
 # compute the pca, ica, fa of the numerical columns,
 # combine them with the hot-bit encoded categorical features
 # and feed all to the random forest classifier
-prf = (catf|> ohe) + numf   |> rf
+prf  = (catf|> ohe) + numf   |> rf
 pred = fit_transform!(prf,X,Y)
 score(:accuracy,pred,Y) |> println
 crossvalidate(prf,X,Y,acc,10)
@@ -199,13 +199,13 @@ crossvalidate(prf,X,Y,acc,10)
 #### 9. A Pipeline for Random Forest Regression
 ```julia
 using Statistics
-iris = getiris()
-Xreg = iris[:,1:3]
-Yreg = iris[:,4] |> Vector
-rfreg = (catf |> ohe) + (numf) |> rf
-pred=fit_transform!(rfreg,Xreg,Yreg)
+iris      = getiris()
+Xreg      = iris[:,1:3]
+Yreg      = iris[:,4] |> Vector
+rfreg     = (catf |> ohe) + (numf) |> rf
+pred      = fit_transform!(rfreg,Xreg,Yreg)
 rmse(X,Y) = mean((X .- Y).^2) |> sqrt
-res=crossvalidate(rfreg,Xreg,Yreg,rmse,10,true)
+res       = crossvalidate(rfreg,Xreg,Yreg,rmse,10,true)
 ```
 
 Note: More examples can be found in the **TSML** and **AutoMLPipeline** packages. 
@@ -236,7 +236,7 @@ for learner in [rf,ada,tree,stack,vote,best]
     pcmc = disc |> ((catf |> ohe) + numf) |> learner
     println(learner.name)
     mean,sd,_ = crossvalidate(pcmc,X,Y,acc,10,true)
-    learners = vcat(learners,DataFrame(name=learner.name,mean=mean,sd=sd))
+    learners  = vcat(learners,DataFrame(name=learner.name,mean=mean,sd=sd))
 end;
 @show learners;
 ```
