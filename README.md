@@ -151,13 +151,13 @@ vote  = VoteEnsemble()
 
 #### 3. Filter categories and hot-encode them
 ```julia
-pohe = @pipeline catf |> ohe
+pohe = catf |> ohe
 tr = fit_transform!(pohe,X,Y)
 ```
 
 #### 4. Filter numeric features
 ```julia
-pdec = @pipeline numf 
+pdec = numf 
 tr = fit_transform!(pdec,X,Y)
 ```
 
@@ -166,7 +166,7 @@ tr = fit_transform!(pdec,X,Y)
 # take all categorical columns and hot-bit encode each, 
 # concatenate them to the numerical features,
 # and feed them to the voting ensemble
-pvote = @pipeline  (catf |> ohe) + (numf) |> vote
+pvote = (catf |> ohe) + (numf) |> vote
 pred = fit_transform!(pvote,X,Y)
 sc=score(:accuracy,pred,Y)
 println(sc)
@@ -190,7 +190,7 @@ julia> @macroexpand @pipeline (catf |> ohe) + (numf) |> vote
 # compute the pca, ica, fa of the numerical columns,
 # combine them with the hot-bit encoded categorical features
 # and feed all to the random forest classifier
-prf = @pipeline (catf|> ohe) + numf   |> rf
+prf = (catf|> ohe) + numf   |> rf
 pred = fit_transform!(prf,X,Y)
 score(:accuracy,pred,Y) |> println
 crossvalidate(prf,X,Y,acc,10)
@@ -202,7 +202,7 @@ using Statistics
 iris = getiris()
 Xreg = iris[:,1:3]
 Yreg = iris[:,4] |> Vector
-rfreg = @pipeline (catf |> ohe) + (numf) |> rf
+rfreg = (catf |> ohe) + (numf) |> rf
 pred=fit_transform!(rfreg,Xreg,Yreg)
 rmse(X,Y) = mean((X .- Y).^2) |> sqrt
 res=crossvalidate(rfreg,Xreg,Yreg,rmse,10,true)
@@ -233,7 +233,7 @@ vote   = VoteEnsemble()
 
 learners = DataFrame()
 for learner in [rf,ada,tree,stack,vote,best]
-    pcmc = @pipeline disc |> ((catf |> ohe) + numf) |> learner
+    pcmc = disc |> ((catf |> ohe) + numf) |> learner
     println(learner.name)
     mean,sd,_ = crossvalidate(pcmc,X,Y,acc,10,true)
     learners = vcat(learners,DataFrame(name=learner.name,mean=mean,sd=sd))
@@ -264,7 +264,7 @@ numf   = NumFeatureSelector()
 @everywhere acc(X,Y) = score(:accuracy,X,Y)
 
 learners = @distributed (vcat) for learner in [rf,ada,tree,stack,vote,best]
-    pcmc = @pipeline disc |> ((catf |> ohe) + (numf)) |> learner
+    pcmc = disc |> ((catf |> ohe) + (numf)) |> learner
     println(learner.name)
     mean,sd,_ = crossvalidate(pcmc,X,Y,acc,10,true)
     DataFrame(name=learner.name,mean=mean,sd=sd)
@@ -278,7 +278,7 @@ If we use the same pre-processing pipeline in 10, we expect that the average per
 best learner which is `lsvc` will be around 73.0.
 ```julia
 Random.seed!(1)
-pcmc = @pipeline disc |> ((catf |> ohe) + (numf)) |> (rf * ada * tree)
+pcmc = disc |> ((catf |> ohe) + (numf)) |> (rf * ada * tree)
 crossvalidate(pcmc,X,Y,acc,10,true)
 ```
 
@@ -287,17 +287,17 @@ It is also possible to use learners in the middle of expression to serve
 as transformers and their outputs become inputs to the final learner as illustrated
 below.
 ```julia
-expr = @pipeline ( 
-                   ((numf)+(catf |> ohe) |> rf) +
-                   ((numf)+(catf |> ohe) |> ada) +
-                   ((numf)+(catf |> ohe) |> tree) 
-                 ) |> ohe |> rf;                
+expr = ( 
+         ((numf)+(catf |> ohe) |> rf) +
+         ((numf)+(catf |> ohe) |> ada) +
+         ((numf)+(catf |> ohe) |> tree) 
+       ) |> ohe |> rf;                
 crossvalidate(expr,X,Y,acc,10,true)
 ```
 One can even include selector function as part of transformer preprocessing routine:
 ```julia
-pjrf = @pipeline disc |> ((catf |> ohe) + (numf |> zscore)) |> 
-                 ((rf * ada ) + (rf * tree * vote)) |> ohe |> ada
+pjrf = disc |> ((catf |> ohe) + (numf |> rf)) |> 
+               ((rf * ada ) + (rf * tree * vote)) |> ohe |> ada
 crossvalidate(pjrf,X,Y,acc,10,true)
 ```
 Note: The `ohe` is necessary in both examples
