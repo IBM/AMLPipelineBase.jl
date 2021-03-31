@@ -5,8 +5,10 @@
 | [![][docs-dev-img]][docs-dev-url] [![][docs-stable-img]][docs-stable-url] | [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] | [![][slack-img]][slack-url] [![][gitter-img]][gitter-url] |
 
 [AMLPipelineBase.jl](https://github.com/IBM/AMLPipelineBase.jl) 
-is the **Base** package of [TSML.jl](https://github.com/IBM/TSML.jl) 
-and [AutoMLPipeline.jl](https://github.com/IBM/AutoMLPipeline.jl).
+is the **Base** package of [TSML.jl](https://github.com/IBM/TSML.jl),
+[AutoMLPipeline.jl](https://github.com/IBM/AutoMLPipeline.jl), and
+[Lale.jl](https://github.com/IBM/Lale.jl).
+
 **AMLPipelineBase** is written in pure **Julia**. It exposes the abstract 
 types commonly shared by **TSML** and **AutoMLPipeline**.
 It also contains basic data preprocessing routines and 
@@ -43,6 +45,8 @@ end
 - To provide a **Base** package for common functions and abstractions shared by:
   - [AutoMLPipeline](https://github.com/IBM/AutoMLPipeline.jl): A package for ML Pipeline Optimization
   - [TSML](https://github.com/IBM/TSML.jl): A package for Time-Series ML
+  - [Lale](https://github.com/IBM/Lale.jl): A Julia wrapper of python's 
+    [Lale](https://github.com/IBM/lale) for semi-automated data science. 
 - To implement efficient multi-threading reduction workflow
 
 ### Package Features
