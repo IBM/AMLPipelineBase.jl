@@ -64,7 +64,7 @@ function crossvalidate(pl::Machine,X::DataFrame,Y::Vector; metric::Function=macc
 end
 
 function crossvalidate(pl::Machine,X::DataFrame,Y::Vector,met::Function,nfolds=10,verbose=true) 
-   crossvalidate(pl,X,Y,metric,nfolds,verbose)
+   crossvalidate(pl,X,Y,met,nfolds,verbose)
 end
 
 function crossvalidate(pl::Machine,X::DataFrame,Y::Vector,met::Function,folds::Int,verbose=true) 

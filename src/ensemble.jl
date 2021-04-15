@@ -6,7 +6,7 @@ import IterTools: product
 import MLBase
 
 # standard included modules
-using DataFrames
+using DataFrames: DataFrame, nrow
 using Random
 
 using ..AbsTypes
@@ -73,12 +73,14 @@ end
 Training phase of the ensemble.
 """
 function fit!(ve::VoteEnsemble, instances::DataFrame, labels::Vector)
+  @assert nrow(instances) == length(labels)
   # Train all learners
   learners = ve.model[:learners]
   for learner in learners
     fit!(learner, instances, labels)
   end
   ve.model[:learners] = learners 
+  return nothing
 end
 
 """
@@ -87,6 +89,7 @@ end
 Prediction phase of the ensemble.
 """
 function transform!(ve::VoteEnsemble, instances::DataFrame)
+  isempty(instances) && return []
   # Make learners vote
   learners = ve.model[:learners]
   predictions = map(learner -> transform!(learner, instances), learners)
@@ -165,6 +168,7 @@ Training phase of the stack of learners.
 - build final model from the trained learners
 """
 function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)
+  @assert nrow(instances) == length(labels)
   learners = se.model[:learners]
   num_learners = size(learners, 1)
   num_instances = size(instances, 1)
@@ -200,6 +204,7 @@ function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)
   se.model[:stacker] = stacker 
   se.model[:label_map] = label_map 
   se.model[:keep_original_features] = keep_original_features
+  return nothing
 end
 
 """
@@ -208,6 +213,7 @@ end
 Build stacker instances and predict
 """
 function transform!(se::StackEnsemble, instances::DataFrame)
+  isempty(instances) && return []
   # Build stacker instances
   learners = se.model[:learners]
   stacker = se.model[:stacker]
@@ -336,6 +342,7 @@ Training phase:
 - train each learner on each partition and obtain validation output
 """
 function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)
+  @assert nrow(instances) == length(labels)
   # Obtain learners as is if no options grid present 
   if bls.model[:learner_options_grid] == nothing
     learners = bls.model[:learners]
@@ -411,6 +418,7 @@ function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)
   bls.model[:best_learner_index]       = best_learner_index
   bls.model[:learners]                 = learners
   bls.model[:learner_partition_scores] = learner_partition_scores
+  return nothing
 end
 
 """ 
@@ -419,6 +427,7 @@ end
 Choose the best learner based on cross-validation results and use it for prediction.
 """
 function transform!(bls::BestLearner, instances::DataFrame)
+   isempty(instances) && return []
    transform!(bls.model[:best_learner], instances)
 end
 

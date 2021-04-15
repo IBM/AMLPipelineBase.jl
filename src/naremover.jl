@@ -1,7 +1,7 @@
 module NARemovers
 
 using Random
-using DataFrames
+using DataFrames: DataFrame, nrow
 
 using ..AbsTypes
 using ..BaseFilters
@@ -61,7 +61,7 @@ Checks and exit of df is empty
 - `labels::Vector=[]`: 
 """
 function fit!(nad::NARemover, features::DataFrame, labels::Vector=[])
-   (features == DataFrame()) && throw(ArgumentError("empty dataframe"))
+   return nothing
 end
 
 
@@ -75,8 +75,8 @@ Removes columns with NAs greater than acceptance rate.
 - `nfeatures::DataFrame`: input
 """
 function transform!(nad::NARemover, nfeatures::DataFrame)
+   isempty(nfeatures) && return DataFrame()
    features = deepcopy(nfeatures) 
-   (features == DataFrame()) && throw(ArgumentError("empty dataframe"))
    sz = nrow(features)
    tol = nad.model[:acceptance]
    colnames = []

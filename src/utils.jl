@@ -106,6 +106,7 @@ function score(metric::Symbol, actual::Vector, predicted::Vector)
    elseif metric == :rmse
       return sqrt(mean((actual .- predicted).^2))
    else
+      println("available metric: :mae, :mse, :accuracy, :rmse")
       throw(ArgumentError("Metric $metric not implemented for score."))
    end
 end

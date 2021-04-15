@@ -1,6 +1,6 @@
 module FeatureSelectors
 
-using DataFrames
+using DataFrames: DataFrame
 using Random
 
 using ..AbsTypes
@@ -56,12 +56,11 @@ Helper function for FeatureSelector.
 FeatureSelector(cols::Vararg{Int}) = FeatureSelector([cols...])
 
 function fit!(ft::FeatureSelector, features::DataFrame, labels::Vector=[])
-   if features == DataFrame()
-      throw(ArgumentError("empty dataframe"))
-   end
+   return nothing
 end
 
 function transform!(ft::FeatureSelector, features::DataFrame)
+   isempty(features) && return DataFrame()
    nfeatures = deepcopy(features) 
    if nfeatures == DataFrame()
       throw(ArgumentError("empty dataframe"))
@@ -106,9 +105,11 @@ function fit!(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])
 
     # create model
     ft.model[:nominal_columns] = catcols
+    return nothing
 end
 
 function transform!(ft::CatFeatureSelector, features::DataFrame)
+   isempty(features) && return DataFrame()
    nfeatures = deepcopy(features)
    catcols = ft.model[:nominal_columns]
    if catcols != []
@@ -148,9 +149,11 @@ function fit!(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])
 
     # create model
     ft.model[:numcols] = numcols
+    return nothing
 end
 
 function transform!(ft::NumFeatureSelector, features::DataFrame)
+   isempty(features) && return DataFrame()
    nfeatures = deepcopy(features)
    numcols = ft.model[:numcols]
    if numcols != [] 
@@ -209,9 +212,11 @@ function fit!(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])
     # create model
     ft.model[:numcols] = numcols
     ft.model[:nominal_columns] = catcols
+    return nothing
 end
 
 function transform!(ft::CatNumDiscriminator, features::DataFrame)
+    isempty(features) && DataFrame()
     nfeatures = features |> deepcopy
     catcols = ft.model[:nominal_columns]
     if catcols != [] 

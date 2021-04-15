@@ -1,7 +1,7 @@
 module BaselineModels
 
 using Random
-using DataFrames
+using DataFrames: DataFrame, nrow
 using StatsBase: mode
 
 using ..Utils
@@ -55,7 +55,9 @@ end
 Get the mode of the training data.
 """
 function fit!(bsl::Baseline,x::DataFrame,y::Vector)
+   @assert nrow(x) == length(y)
    bsl.model[:choice] = bsl.model[:strat](y)
+   return nothing
 end
 
 """
@@ -64,6 +66,7 @@ end
 Return the mode in classification.
 """
 function transform!(bsl::Baseline,x::DataFrame)
+  isempty(x) && return []
   fill(bsl.model[:choice],size(x,1))
 end
 
@@ -87,7 +90,7 @@ mutable struct Identity <: Transformer
 end
 
 """
-    Baseline(name::String,opt...)
+    Identity(name::String,opt...)
 
  Helper function
 """
@@ -100,7 +103,7 @@ end
 
 Does nothing.
 """
-function fit!(idy::Identity,x::DataFrame,y::Vector)
+function fit!(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])
     nothing
 end
 
@@ -109,7 +112,7 @@ end
 
 Return the input as output.
 """
-function transform!(idy::Identity,x::DataFrame)
+function transform!(idy::Identity,x::DataFrame=DataFrame())
     return x
 end
 

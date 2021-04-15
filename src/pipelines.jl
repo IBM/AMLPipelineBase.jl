@@ -91,6 +91,7 @@ function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[]
 
    pipe.model[:machines] = new_machines
    pipe.model[:machine_args] = machine_args
+   return nothing
 end
 
 function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())
@@ -164,9 +165,11 @@ function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])
 
   pipe.model[:machines] = new_machines
   pipe.model[:machine_args] = machine_args
+  return nothing
 end
 
 function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())
+  isempty(features) && return []
   machines = pipe.model[:machines]
   instances = deepcopy(features)
   new_instances = DataFrame()
