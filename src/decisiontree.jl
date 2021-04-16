@@ -79,7 +79,7 @@ end
 
 Optimize the hyperparameters of `PrunedTree` instance.
 """
-function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector) 
+function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector)::Nothing
   @assert nrow(features) == length(labels)
   instances=Matrix(features)
   args = ptree.model[:impl_args]
@@ -103,7 +103,7 @@ end
 
 Predict using the optimized hyperparameters of the trained `PrunedTree` instance.
 """
-function transform!(ptree::PrunedTree, features::DataFrame)
+function transform!(ptree::PrunedTree, features::DataFrame)::Vector
   isempty(features) && return []
   instances=Matrix(features)
   model = ptree.model[:dtmodel]
@@ -175,7 +175,7 @@ end
 
 Optimize the parameters of the `RandomForest` instance.
 """
-function fit!(forest::RandomForest, features::DataFrame, labels::Vector) 
+function fit!(forest::RandomForest, features::DataFrame, labels::Vector)::Nothing
   @assert nrow(features) == length(labels)
   instances=Matrix(features)
   # Set training-dependent options
@@ -201,7 +201,7 @@ end
 
 Predict using the optimized hyperparameters of the trained `RandomForest` instance.
 """
-function transform!(forest::RandomForest, features::DataFrame)
+function transform!(forest::RandomForest, features::DataFrame)::Vector
   isempty(features) && return []
   instances = features
   instances = Matrix(features)
@@ -259,7 +259,7 @@ end
 
 Optimize the hyperparameters of `Adaboost` instance.
 """
-function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector) 
+function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector)::Nothing
   @assert nrow(features) == length(labels)
   instances = Matrix(features)
   # NOTE(svs14): Variable 'model' renamed to 'ensemble'.
@@ -279,7 +279,7 @@ end
 
 Predict using the optimized hyperparameters of the trained `Adaboost` instance.
 """
-function transform!(adaboost::Adaboost, features::DataFrame)
+function transform!(adaboost::Adaboost, features::DataFrame)::Vector
   isempty(features) && return []
   instances = Matrix(features)
   return DT.apply_adaboost_stumps(

@@ -37,7 +37,7 @@ export VoteEnsemble, StackEnsemble, BestLearner
 
 include("crossvalidator.jl")
 using .CrossValidators
-export crossvalidate
+export crossvalidate, pipe_performance
 
 include("naremover.jl")
 using .NARemovers

@@ -54,7 +54,7 @@ end
 
 Get the mode of the training data.
 """
-function fit!(bsl::Baseline,x::DataFrame,y::Vector)
+function fit!(bsl::Baseline,x::DataFrame,y::Vector)::Nothing
    @assert nrow(x) == length(y)
    bsl.model[:choice] = bsl.model[:strat](y)
    return nothing
@@ -65,7 +65,7 @@ end
 
 Return the mode in classification.
 """
-function transform!(bsl::Baseline,x::DataFrame)
+function transform!(bsl::Baseline,x::DataFrame)::Vector
   isempty(x) && return []
   fill(bsl.model[:choice],size(x,1))
 end
@@ -103,7 +103,7 @@ end
 
 Does nothing.
 """
-function fit!(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])
+function fit!(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])::Nothing
     nothing
 end
 
@@ -112,7 +112,7 @@ end
 
 Return the input as output.
 """
-function transform!(idy::Identity,x::DataFrame=DataFrame())
+function transform!(idy::Identity,x::DataFrame=DataFrame())::DataFrame
     return x
 end
 

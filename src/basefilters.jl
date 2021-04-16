@@ -51,7 +51,7 @@ function OneHotEncoder(name::String; opt...)
    OneHotEncoder(Dict(:name=>name,Dict(pairs(opt))...))
 end
 
-function fit!(ohe::OneHotEncoder, myinstances::DataFrame, labels::Vector=[]) 
+function fit!(ohe::OneHotEncoder, myinstances::DataFrame, labels::Vector=[])::Nothing
    # Obtain nominal columns
    nominal_columns = ohe.model[:nominal_columns]
    if nominal_columns == Int[]
@@ -72,7 +72,7 @@ function fit!(ohe::OneHotEncoder, myinstances::DataFrame, labels::Vector=[])
    return nothing
 end
 
-function transform!(ohe::OneHotEncoder, pinstances::DataFrame)
+function transform!(ohe::OneHotEncoder, pinstances::DataFrame)::DataFrame
    isempty(pinstances) && return DataFrame()
    myinstances = deepcopy(pinstances)
    nominal_columns = ohe.model[:nominal_columns]
@@ -148,11 +148,11 @@ function Imputer(name::String;opt...)
    Imputer(Dict(:name=>name,Dict(pairs(opt))...))
 end
 
-function fit!(imp::Imputer, myinstances::DataFrame, labels::Vector=[]) 
+function fit!(imp::Imputer, myinstances::DataFrame, labels::Vector=[])::Nothing
    nothing
 end
 
-function transform!(imp::Imputer, myinstances::DataFrame) 
+function transform!(imp::Imputer, myinstances::DataFrame)::DataFrame 
    isempty(myinstances) && return DataFrame()
    new_instances = deepcopy(myinstances)
    strategy = imp.model[:strategy]
@@ -216,7 +216,7 @@ function Wrapper(transformer::Machine;opt...)
           )
 end
 
-function fit!(wrapper::Wrapper, myinstances::DataFrame, labels::Vector=[]) 
+function fit!(wrapper::Wrapper, myinstances::DataFrame, labels::Vector=[])::Nothing
    transformer_args = wrapper.model[:transformer_args]
    transformer = createtransformer(
                                    wrapper.model[:transformer],transformer_args
@@ -232,7 +232,7 @@ function fit!(wrapper::Wrapper, myinstances::DataFrame, labels::Vector=[])
    return nothing
 end
 
-function transform!(wrapper::Wrapper, myinstances::DataFrame)
+function transform!(wrapper::Wrapper, myinstances::DataFrame)::DataFrame
    isempty(myinstances) && return DataFrame()
    transformer = wrapper.model[:transformer]
    return transform!(transformer, myinstances) 
@@ -248,7 +248,7 @@ Create transformer
 
 Returns: new transformer.
 """
-function createtransformer(prototype::Transformer, args=Dict())
+function createtransformer(prototype::Transformer, args=Dict())::Transformer
    new_args = copy(prototype.model)
    if args != Dict()
       new_args = mergedict(new_args, args)

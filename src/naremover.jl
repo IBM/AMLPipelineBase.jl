@@ -60,7 +60,7 @@ Checks and exit of df is empty
 - `features::DataFrame`: input
 - `labels::Vector=[]`: 
 """
-function fit!(nad::NARemover, features::DataFrame, labels::Vector=[])
+function fit!(nad::NARemover, features::DataFrame, labels::Vector=[])::Nothing
    return nothing
 end
 
@@ -74,7 +74,7 @@ Removes columns with NAs greater than acceptance rate.
 - `nad::NARemover`: custom type
 - `nfeatures::DataFrame`: input
 """
-function transform!(nad::NARemover, nfeatures::DataFrame)
+function transform!(nad::NARemover, nfeatures::DataFrame)::DataFrame
    isempty(nfeatures) && return DataFrame()
    features = deepcopy(nfeatures) 
    sz = nrow(features)

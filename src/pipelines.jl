@@ -68,7 +68,7 @@ function Pipeline(machs::Vararg{<:Machine})
    return combo
 end
 
-function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[])
+function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[])::Nothing
    instances=deepcopy(features)
    machines = pipe.model[:machines]
    machine_args = pipe.model[:machine_args]
@@ -94,7 +94,7 @@ function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[]
    return nothing
 end
 
-function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())
+function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())::Union{Vector, DataFrame}
    machines = pipe.model[:machines]
 
    current_instances = deepcopy(instances)
@@ -149,7 +149,7 @@ function ComboPipeline(machs::Vararg{<:Machine})
    return combo
 end
 
-function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])
+function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])::Nothing
   instances=deepcopy(features)
   machines = pipe.model[:machines]
   machine_args = pipe.model[:machine_args]
@@ -168,7 +168,7 @@ function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])
   return nothing
 end
 
-function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())
+function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union{Vector,DataFrame}
   isempty(features) && return []
   machines = pipe.model[:machines]
   instances = deepcopy(features)

@@ -12,7 +12,7 @@ using ..AbsTypes
 using Random
 using DataFrames: DataFrame
 
-export crossvalidate
+export crossvalidate, pipe_performance
 
 macc(X,Y) = score(:accuracy,X,Y)
 
@@ -41,7 +41,7 @@ function crossvalidate(pl::Machine,X::DataFrame,Y::Vector,pfunc::Function,nfolds
       tstY = Y[tsndx] |> collect
       res = 0.0
       try 
-         res = pipe_accuracy(ppl,pfunc,trX,trY,tstX,tstY)
+         res = pipe_performance(ppl,pfunc,trX,trY,tstX,tstY)
          push!(pacc,res)
          fold += 1
          if verbose == true
@@ -71,7 +71,7 @@ function crossvalidate(pl::Machine,X::DataFrame,Y::Vector,met::Function,folds::I
    crossvalidate(pl,X,Y,met,folds,versbose)
 end
 
-function pipe_accuracy(plearner::Machine,perf::Function,trX::DataFrame, trY::Vector,tstX::DataFrame,tstY::Vector)
+function pipe_performance(plearner::Machine,perf::Function,trX::DataFrame, trY::Vector,tstX::DataFrame,tstY::Vector)
    learner = deepcopy(plearner)
    fit!(learner,trX,trY)
    pred = transform!(learner,tstX)

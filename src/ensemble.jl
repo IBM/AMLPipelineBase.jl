@@ -72,7 +72,7 @@ end
 
 Training phase of the ensemble.
 """
-function fit!(ve::VoteEnsemble, instances::DataFrame, labels::Vector)
+function fit!(ve::VoteEnsemble, instances::DataFrame, labels::Vector)::Nothing
   @assert nrow(instances) == length(labels)
   # Train all learners
   learners = ve.model[:learners]
@@ -88,7 +88,7 @@ end
 
 Prediction phase of the ensemble.
 """
-function transform!(ve::VoteEnsemble, instances::DataFrame)
+function transform!(ve::VoteEnsemble, instances::DataFrame)::Vector
   isempty(instances) && return []
   # Make learners vote
   learners = ve.model[:learners]
@@ -167,7 +167,7 @@ Training phase of the stack of learners.
 - train stacker on learners' outputs
 - build final model from the trained learners
 """
-function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)
+function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)::Nothing
   @assert nrow(instances) == length(labels)
   learners = se.model[:learners]
   num_learners = size(learners, 1)
@@ -212,7 +212,7 @@ end
 
 Build stacker instances and predict
 """
-function transform!(se::StackEnsemble, instances::DataFrame)
+function transform!(se::StackEnsemble, instances::DataFrame)::Vector
   isempty(instances) && return []
   # Build stacker instances
   learners = se.model[:learners]
@@ -341,7 +341,7 @@ Training phase:
 - generate partitions
 - train each learner on each partition and obtain validation output
 """
-function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)
+function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)::Nothing
   @assert nrow(instances) == length(labels)
   # Obtain learners as is if no options grid present 
   if bls.model[:learner_options_grid] == nothing
@@ -426,7 +426,7 @@ end
 
 Choose the best learner based on cross-validation results and use it for prediction.
 """
-function transform!(bls::BestLearner, instances::DataFrame)
+function transform!(bls::BestLearner, instances::DataFrame)::Vector
    isempty(instances) && return []
    transform!(bls.model[:best_learner], instances)
 end
