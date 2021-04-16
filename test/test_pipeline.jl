@@ -11,8 +11,8 @@ using AMLPipelineBase.Utils
 const data     = getiris()
 const features = data[:,1:4]
 const X        = data[:,1:5]
-const Y               = data[:,5] |> Vector
-X[!,5]                = X[!,5] .|> string
+const Y        = data[:,5] |> Vector
+X[!,5]         = X[!,5] .|> string
 
 const ohe = OneHotEncoder()
 const noop = Identity()
@@ -89,4 +89,15 @@ end
   test_pipeline()
 end
 
+function test_split()
+   dt1 = train_test_split(features,Y)
+   perf1 = pipe_performance(rf,(x,y)->score(:accuracy,x,y), dt1.trX,dt1.trY,dt1.tstX,dt1.tstY)
+   @test perf1 > 50.0
+   dt2 = train_test_split(data[:,1:3],Vector(data[:,4]))
+   perf2 = pipe_performance(rf,(x,y)->score(:rmse,x,y), dt2.trX,dt2.trY,dt2.tstX,dt2.tstY)
+   @test perf2 < 0.50
+end
+@testset "Performance and train/test split" begin
+  Random.seed!(123)
+  test_split()
 end

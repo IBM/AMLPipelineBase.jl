@@ -16,7 +16,8 @@ export holdout, kfold, score, infer_eltype, nested_dict_to_tuples,
        mergedict, getiris, getprofb,
        skipmean,skipmedian,skipstd,
        aggregatorclskipmissing,
-       find_catnum_columns
+       find_catnum_columns,
+       train_test_split
 
 
 """
@@ -311,6 +312,23 @@ end
 function getprofb()
    profb = CSV.read(joinpath(Base.@__DIR__,"../data","profb.csv"),DataFrame)
    return profb
+end
+
+function train_test_split(xdf::DataFrame,yvec::Vector; testprop=0.30, shuffle=true)
+   @assert nrow(xdf) == length(yvec)
+   sz = length(yvec)
+   ndx = collect(1:sz)
+   if shuffle == true
+      ndx = randperm(sz)
+   end
+   pivot = round(Int,testprop * sz)
+   right = ndx[1:pivot]
+   left = ndx[pivot+1:end]
+   trX = xdf[left,:]
+   trY = yvec[left]
+   tstX = xdf[right,:]
+   tstY = yvec[right]
+   return(;trX,trY,tstX,tstY)
 end
 
 #function getiris()
