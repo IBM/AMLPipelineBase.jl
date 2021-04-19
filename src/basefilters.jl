@@ -8,9 +8,9 @@ using Statistics
 using ..Utils
 using ..AbsTypes
 
-import ..AbsTypes: fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
 
-export fit!,transform!
+export fit, fit!, transform, transform!
 export OneHotEncoder, Imputer, Wrapper
 
 
@@ -72,6 +72,11 @@ function fit!(ohe::OneHotEncoder, myinstances::DataFrame, labels::Vector=[])::No
    return nothing
 end
 
+function fit(ohe::OneHotEncoder, myinstances::DataFrame, labels::Vector=[])::OneHotEncoder
+   fit!(ohe,myinstances,labels)
+   return deepcopy(ohe)
+end
+
 function transform!(ohe::OneHotEncoder, pinstances::DataFrame)::DataFrame
    isempty(pinstances) && return DataFrame()
    myinstances = deepcopy(pinstances)
@@ -113,6 +118,9 @@ function transform!(ohe::OneHotEncoder, pinstances::DataFrame)::DataFrame
    return transformed_instances |> x -> DataFrame(x,:auto)
 end
 
+function transform(ohe::OneHotEncoder, pinstances::DataFrame)::DataFrame
+   return transform!(ohe,pinstances)
+end
 
 """
     Imputer(
@@ -152,6 +160,10 @@ function fit!(imp::Imputer, myinstances::DataFrame, labels::Vector=[])::Nothing
    nothing
 end
 
+function fit(imp::Imputer, myinstances::DataFrame, labels::Vector=[])::Imputer
+   return imp
+end
+
 function transform!(imp::Imputer, myinstances::DataFrame)::DataFrame 
    isempty(myinstances) && return DataFrame()
    new_instances = deepcopy(myinstances)
@@ -175,6 +187,10 @@ function transform!(imp::Imputer, myinstances::DataFrame)::DataFrame
       end
    end
    return new_instances 
+end
+
+function transform(imp::Imputer, myinstances::DataFrame)::DataFrame 
+   return transform!(imp,myinstances)
 end
 
 """
@@ -232,10 +248,19 @@ function fit!(wrapper::Wrapper, myinstances::DataFrame, labels::Vector=[])::Noth
    return nothing
 end
 
+function fit(wrapper::Wrapper, myinstances::DataFrame, labels::Vector=[])::Wrapper
+   fit!(wrapper,myinstances,labels)
+   return deepcopy(wrapper)
+end
+
 function transform!(wrapper::Wrapper, myinstances::DataFrame)::DataFrame
    isempty(myinstances) && return DataFrame()
    transformer = wrapper.model[:transformer]
    return transform!(transformer, myinstances) 
+end
+
+function transform(wrapper::Wrapper, myinstances::DataFrame)::DataFrame
+   return transform!(wrapper,myinstances)
 end
 
 """

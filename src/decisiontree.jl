@@ -10,8 +10,8 @@ using Random
 using ..AbsTypes
 using ..Utils
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 
 export PrunedTree, RandomForest, Adaboost
 
@@ -97,6 +97,10 @@ function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector)::Nothing
   return nothing
 end
 
+function fit(ptree::PrunedTree, features::DataFrame, labels::Vector)::PrunedTree
+   fit!(ptree,features,labels)
+   return deepcopy(ptree)
+end
 
 """
     transform!(ptree::PrunedTree, features::DataFrame)
@@ -110,6 +114,9 @@ function transform!(ptree::PrunedTree, features::DataFrame)::Vector
   return DT.apply_tree(model, instances)
 end
 
+function transform(ptree::PrunedTree, features::DataFrame)::Vector
+   return transform!(ptree,features)
+end
 
 # Random forest (CART).
 
@@ -194,6 +201,12 @@ function fit!(forest::RandomForest, features::DataFrame, labels::Vector)::Nothin
   return nothing
 end
 
+function fit(forest::RandomForest, features::DataFrame, labels::Vector)::RandomForest
+   fit!(forest, features, labels)
+   return deepcopy(forest)
+end
+
+
 
 """
     transform!(forest::RandomForest, features::DataFrame) 
@@ -209,6 +222,9 @@ function transform!(forest::RandomForest, features::DataFrame)::Vector
   return DT.apply_forest(model, instances)
 end
 
+function transform(forest::RandomForest, features::DataFrame)::Vector
+   return transform!(forest, features)
+end
 
 # Adaboosted decision stumps.
 
@@ -274,6 +290,11 @@ function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector)::Nothing
   return nothing
 end
 
+function fit(adaboost::Adaboost, features::DataFrame, labels::Vector)::Adaboost
+   fit!(adaboost, features, labels)
+   return deepcopy(adaboost)
+end
+
 """
     transform!(adaboost::Adaboost, features::DataFrame)
 
@@ -287,5 +308,8 @@ function transform!(adaboost::Adaboost, features::DataFrame)::Vector
   )
 end
 
+function transform(adaboost::Adaboost, features::DataFrame)::Vector
+   return transform!(adaboost, features)
+end
 
 end # module

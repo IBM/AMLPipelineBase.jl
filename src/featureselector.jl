@@ -7,8 +7,8 @@ using ..AbsTypes
 using ..BaseFilters
 using ..Utils
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
 # generic way to extract num/cat features by specifying their columns
@@ -59,6 +59,10 @@ function fit!(ft::FeatureSelector, features::DataFrame, labels::Vector=[])::Noth
    return nothing
 end
 
+function fit(ft::FeatureSelector, features::DataFrame, labels::Vector=[])::FeatureSelector
+   return ft
+end
+
 function transform!(ft::FeatureSelector, features::DataFrame)::DataFrame
    isempty(features) && return DataFrame()
    nfeatures = deepcopy(features) 
@@ -71,6 +75,10 @@ function transform!(ft::FeatureSelector, features::DataFrame)::DataFrame
    else
       return DataFrame()
    end
+end
+
+function transform(ft::FeatureSelector, features::DataFrame)::DataFrame
+   return transform!(ft,features)
 end
 
 # ----------
@@ -108,6 +116,11 @@ function fit!(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])::N
     return nothing
 end
 
+function fit(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])::CatFeatureSelector
+   fit!(ft,features,labels)
+   return deepcopy(ft)
+end
+
 function transform!(ft::CatFeatureSelector, features::DataFrame)::DataFrame
    isempty(features) && return DataFrame()
    nfeatures = deepcopy(features)
@@ -117,6 +130,10 @@ function transform!(ft::CatFeatureSelector, features::DataFrame)::DataFrame
    else
       return DataFrame()
    end
+end
+
+function transform(ft::CatFeatureSelector, features::DataFrame)::DataFrame
+   transform!(ft,features)
 end
 
 """
@@ -152,6 +169,11 @@ function fit!(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])::N
     return nothing
 end
 
+function fit(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])::NumFeatureSelector
+   fit!(ft,features,labels)
+   return deepcopy(ft)
+end
+
 function transform!(ft::NumFeatureSelector, features::DataFrame)::DataFrame
    isempty(features) && return DataFrame()
    nfeatures = deepcopy(features)
@@ -161,6 +183,10 @@ function transform!(ft::NumFeatureSelector, features::DataFrame)::DataFrame
    else
       return DataFrame()
    end
+end
+
+function transform(ft::NumFeatureSelector, features::DataFrame)::DataFrame
+   transform!(ft,features)
 end
 
 """
@@ -215,6 +241,11 @@ function fit!(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])::
     return nothing
 end
 
+function fit(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])::CatNumDiscriminator
+   fit!(ft,features,labels)
+   return deepcopy(ft)
+end
+
 function transform!(ft::CatNumDiscriminator, features::DataFrame)::DataFrame
     isempty(features) && DataFrame()
     nfeatures = features |> deepcopy
@@ -223,6 +254,10 @@ function transform!(ft::CatNumDiscriminator, features::DataFrame)::DataFrame
 		nfeatures[!,catcols] = nfeatures[!,catcols] .|> string
     end
     return nfeatures
+end
+
+function transform(ft::CatNumDiscriminator, features::DataFrame)::DataFrame
+   return transform!(ft,features)
 end
 
 end

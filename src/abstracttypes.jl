@@ -2,7 +2,7 @@ module AbsTypes
 
 using DataFrames
 
-export fit!, transform!, fit_transform!
+export fit, fit!, transform, transform!, fit_transform, fit_transform!
 export Machine, Learner, Transformer, Workflow, Computer
 
 abstract type Machine end
@@ -21,6 +21,10 @@ function fit!(mc::Machine, input::DataFrame, output::Vector)::Nothing
    throw(ArgumentError(typeof(mc)," not implemented"))
 end
 
+function fit(mc::Machine, input::DataFrame, output::Vector)::Machine
+   throw(ArgumentError(typeof(mc)," not implemented"))
+end
+
 
 """
 transform!(mc::Machine, input::DataFrame)
@@ -29,6 +33,10 @@ Generic trait to be overloaded by different subtypes of Machine.
 Multiple dispatch for transform!.
 """
 function transform!(mc::Machine, input::DataFrame)::Union{DataFrame,Vector}
+   throw(ArgumentError(typeof(mc)," not implemented"))
+end
+
+function transform(mc::Machine, input::DataFrame)::Union{DataFrame,Vector}
    throw(ArgumentError(typeof(mc)," not implemented"))
 end
 
@@ -41,6 +49,11 @@ Dynamic dispatch that calls in sequence `fit!` and `transform!` functions.
 function fit_transform!(mc::Machine, input::DataFrame=DataFrame(), output::Vector=Vector())::Union{Vector,DataFrame}
    fit!(mc,input,output)
    transform!(mc,input)
+end
+
+function fit_transform(mc::Machine, input::DataFrame=DataFrame(), output::Vector=Vector())::Union{Vector,DataFrame}
+   rmc = fit(mc,input,output)
+   transform(rmc,input)
 end
 
 end

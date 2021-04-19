@@ -7,9 +7,9 @@ using StatsBase: mode
 using ..Utils
 using ..AbsTypes
 
-import ..AbsTypes: fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
 
-export fit!,transform!
+export fit, fit!, transform, transform!
 export Baseline, Identity
 
 """
@@ -60,6 +60,11 @@ function fit!(bsl::Baseline,x::DataFrame,y::Vector)::Nothing
    return nothing
 end
 
+function fit(bsl::Baseline,x::DataFrame,y::Vector)::Baseline
+   fit!(bsl,x,y)
+   return deepcopy(bsl)
+end
+
 """
     transform!(bsl::Baseline,x::DataFrame)
 
@@ -68,6 +73,10 @@ Return the mode in classification.
 function transform!(bsl::Baseline,x::DataFrame)::Vector
   isempty(x) && return []
   fill(bsl.model[:choice],size(x,1))
+end
+
+function transform(bsl::Baseline,x::DataFrame)::Vector
+   return transform!(bsl,x)
 end
 
 """
@@ -107,12 +116,20 @@ function fit!(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])::Nothing
     nothing
 end
 
+function fit(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])::Identity
+   return idy
+end
+
 """
     transform!(idy::Identity,x::DataFrame)
 
 Return the input as output.
 """
 function transform!(idy::Identity,x::DataFrame=DataFrame())::DataFrame
+    return x
+end
+
+function transform(idy::Identity,x::DataFrame=DataFrame())::DataFrame
     return x
 end
 

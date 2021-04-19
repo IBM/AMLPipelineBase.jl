@@ -8,11 +8,11 @@ using ..BaseFilters
 using ..Utils
 using ..EnsembleMethods: BestLearner
 
-import Base: |>, +, |, *
+import Base: |>, +, |, *, >>
 export |>, +, |, *
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 export Pipeline, ComboPipeline 
 export @pipeline, @pipelinex, @pipelinez
 export processexpr!,sympipeline
@@ -94,6 +94,11 @@ function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[]
    return nothing
 end
 
+function fit(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[])::Pipeline
+   fit!(pipe, features, labels)
+   return deepcopy(pipe)
+end
+
 function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())::Union{Vector, DataFrame}
    machines = pipe.model[:machines]
 
@@ -106,6 +111,9 @@ function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())::Union{Vec
    return current_instances
 end
 
+function transform(pipe::Pipeline, instances::DataFrame=DataFrame())::Union{Vector, DataFrame}
+   return transform!(pipe, instances)
+end
 
 """
     ComboPipeline(machs::Vector{T}) where {T<:Machine}
@@ -168,6 +176,11 @@ function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])::Noth
   return nothing
 end
 
+function fit(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])::ComboPipeline
+   fit!(pipe, features, labels)
+   return deepcopy(pipe)
+end
+
 function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union{Vector,DataFrame}
   isempty(features) && return []
   machines = pipe.model[:machines]
@@ -180,6 +193,10 @@ function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union
   end
 
   return new_instances
+end
+
+function transform(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union{Vector,DataFrame}
+   return transform!(pipe, features)
 end
 
 function processexpr!(args::AbstractVector)
@@ -234,6 +251,7 @@ function sympipeline(pexpr)
 end
 
 |>(a::Machine, b::Machine) = Pipeline([a,b])
+>>(a::Machine, b::Machine) = Pipeline([a,b])
 +(a::Machine, b::Machine)  = ComboPipeline([a,b])
 *(a::Machine, b::Machine)  = BestLearner([a,b])
 |(a::Machine, b::Machine)  = BestLearner([a,b])

@@ -12,8 +12,8 @@ using Random
 using ..AbsTypes
 using ..Utils
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 export VoteEnsemble, StackEnsemble, BestLearner
 
 using ..DecisionTreeLearners
@@ -83,6 +83,11 @@ function fit!(ve::VoteEnsemble, instances::DataFrame, labels::Vector)::Nothing
   return nothing
 end
 
+function fit(ve::VoteEnsemble, instances::DataFrame, labels::Vector)::VoteEnsemble
+   fit!(ve, instances, labels)
+   return deepcopy(ve)
+end
+
 """
     transform!(ve::VoteEnsemble, instances::DataFrame)
 
@@ -95,6 +100,10 @@ function transform!(ve::VoteEnsemble, instances::DataFrame)::Vector
   predictions = map(learner -> transform!(learner, instances), learners)
   # Return majority vote prediction
   return StatsBase.mode(predictions)
+end
+
+function transform(ve::VoteEnsemble, instances::DataFrame)::Vector
+   return transform!(ve,instances)
 end
 
 """
@@ -207,6 +216,11 @@ function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)::Nothing
   return nothing
 end
 
+function fit(se::StackEnsemble, instances::DataFrame, labels::Vector)::StackEnsemble
+   fit!(se,instances,labels)
+   return deepcopy(se)
+end
+
 """
     transform!(se::StackEnsemble, instances::DataFrame)
 
@@ -224,6 +238,10 @@ function transform!(se::StackEnsemble, instances::DataFrame)::Vector
 
   # Predict
   return transform!(stacker, stacker_instances)
+end
+
+function transform(se::StackEnsemble, instances::DataFrame)::Vector
+   transform!(se,instances)
 end
 
 # Build stacker instances.
@@ -421,6 +439,11 @@ function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)::Nothing
   return nothing
 end
 
+function fit(bls::BestLearner, instances::DataFrame, labels::Vector)::BestLearner
+   fit!(bls,instances,labels)
+   return deepcopy(bls)
+end
+
 """ 
     transform!(bls::BestLearner, instances::DataFrame)
 
@@ -429,6 +452,10 @@ Choose the best learner based on cross-validation results and use it for predict
 function transform!(bls::BestLearner, instances::DataFrame)::Vector
    isempty(instances) && return []
    transform!(bls.model[:best_learner], instances)
+end
+
+function transform(bls::BestLearner, instances::DataFrame)::Vector
+   transform!(bls,instances)
 end
 
 end # module
