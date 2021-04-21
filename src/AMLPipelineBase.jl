@@ -7,7 +7,6 @@ export fit, fit!, transform, transform!, fit_transform, fit_transform!
 
 include("utils.jl")
 using .Utils
-using AMLPipelineBase.Utils
 export holdout, kfold, score, infer_eltype, 
        nested_dict_to_tuples, 
        nested_dict_set!, 
@@ -17,6 +16,7 @@ export holdout, kfold, score, infer_eltype,
        skipmean,skipmedian,skipstd,
        aggregatorclskipmissing,
        getiris, getprofb,
+       find_catnum_columns,
        train_test_split
 
 
