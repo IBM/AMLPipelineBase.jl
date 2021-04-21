@@ -3,17 +3,22 @@ module AMLPipelineBase
 include("abstracttypes.jl")
 using .AbsTypes
 export Machine, Computer, Workflow, Learner, Transformer
-export fit!, transform!, fit_transform!
+export fit, fit!, transform, transform!, fit_transform, fit_transform!
 
 include("utils.jl")
 using .Utils
 using AMLPipelineBase.Utils
-export holdout, kfold, score, infer_eltype, nested_dict_to_tuples, 
-       nested_dict_set!, nested_dict_merge, create_transformer,
+export holdout, kfold, score, infer_eltype, 
+       nested_dict_to_tuples, 
+       nested_dict_set!, 
+       nested_dict_merge, 
+       create_transformer,
        mergedict, getiris,
        skipmean,skipmedian,skipstd,
        aggregatorclskipmissing,
-       getiris, getprofb
+       getiris, getprofb,
+       train_test_split
+
 
 include("baselinemodels.jl")
 using .BaselineModels
@@ -37,7 +42,7 @@ export VoteEnsemble, StackEnsemble, BestLearner
 
 include("crossvalidator.jl")
 using .CrossValidators
-export crossvalidate
+export crossvalidate, pipe_performance
 
 include("naremover.jl")
 using .NARemovers
@@ -46,7 +51,7 @@ export NARemover
 include("pipelines.jl")
 using .Pipelines
 export @pipeline, @pipelinex, @pipelinez
-export |>, +, |, *
+export |>, +, |, *, >>
 export Pipeline, ComboPipeline
 
 end # module

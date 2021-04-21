@@ -22,6 +22,13 @@ function test_decisiontree()
     for (name,obj) in learners
         fit!(obj,X,Y)
         res = transform!(obj,X)
+        @testset "$name: Full dataset mutate" begin
+            @test sum(res .== Y)/length(Y)*100 |> floor > results[name]
+        end
+    end
+    for (name,obj) in learners
+        ob=fit(obj,X,Y)
+        res = transform(ob,X)
         @testset "$name: Full dataset" begin
             @test sum(res .== Y)/length(Y)*100 |> floor > results[name]
         end
@@ -32,6 +39,13 @@ function test_decisiontree()
     for (name,obj) in learners
         fit!(obj,X[trndx,:],Y[trndx])
         res = transform!(obj,X[tstndx,:])
+        @testset "$name: partial dataset mutate" begin
+            @test sum(res .== Y[tstndx])/length(Y[tstndx])*100 |> floor > results[name]
+        end
+    end
+    for (name,obj) in learners
+        ob=fit(obj,X[trndx,:],Y[trndx])
+        res = transform(ob,X[tstndx,:])
         @testset "$name: partial dataset" begin
             @test sum(res .== Y[tstndx])/length(Y[tstndx])*100 |> floor > results[name]
         end

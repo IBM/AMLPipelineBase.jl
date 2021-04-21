@@ -8,11 +8,11 @@ using ..BaseFilters
 using ..Utils
 using ..EnsembleMethods: BestLearner
 
-import Base: |>, +, |, *
+import Base: |>, +, |, *, >>
 export |>, +, |, *
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 export Pipeline, ComboPipeline 
 export @pipeline, @pipelinex, @pipelinez
 export processexpr!,sympipeline
@@ -68,7 +68,7 @@ function Pipeline(machs::Vararg{<:Machine})
    return combo
 end
 
-function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[])
+function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[])::Nothing
    instances=deepcopy(features)
    machines = pipe.model[:machines]
    machine_args = pipe.model[:machine_args]
@@ -91,9 +91,15 @@ function fit!(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[]
 
    pipe.model[:machines] = new_machines
    pipe.model[:machine_args] = machine_args
+   return nothing
 end
 
-function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())
+function fit(pipe::Pipeline, features::DataFrame=DataFrame(), labels::Vector=[])::Pipeline
+   fit!(pipe, features, labels)
+   return deepcopy(pipe)
+end
+
+function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())::Union{Vector, DataFrame}
    machines = pipe.model[:machines]
 
    current_instances = deepcopy(instances)
@@ -105,6 +111,9 @@ function transform!(pipe::Pipeline, instances::DataFrame=DataFrame())
    return current_instances
 end
 
+function transform(pipe::Pipeline, instances::DataFrame=DataFrame())::Union{Vector, DataFrame}
+   return transform!(pipe, instances)
+end
 
 """
     ComboPipeline(machs::Vector{T}) where {T<:Machine}
@@ -148,7 +157,7 @@ function ComboPipeline(machs::Vararg{<:Machine})
    return combo
 end
 
-function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])
+function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])::Nothing
   instances=deepcopy(features)
   machines = pipe.model[:machines]
   machine_args = pipe.model[:machine_args]
@@ -164,9 +173,16 @@ function fit!(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])
 
   pipe.model[:machines] = new_machines
   pipe.model[:machine_args] = machine_args
+  return nothing
 end
 
-function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())
+function fit(pipe::ComboPipeline, features::DataFrame, labels::Vector=[])::ComboPipeline
+   fit!(pipe, features, labels)
+   return deepcopy(pipe)
+end
+
+function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union{Vector,DataFrame}
+  isempty(features) && return []
   machines = pipe.model[:machines]
   instances = deepcopy(features)
   new_instances = DataFrame()
@@ -177,6 +193,10 @@ function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())
   end
 
   return new_instances
+end
+
+function transform(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union{Vector,DataFrame}
+   return transform!(pipe, features)
 end
 
 function processexpr!(args::AbstractVector)
@@ -231,6 +251,7 @@ function sympipeline(pexpr)
 end
 
 |>(a::Machine, b::Machine) = Pipeline([a,b])
+>>(a::Machine, b::Machine) = Pipeline([a,b])
 +(a::Machine, b::Machine)  = ComboPipeline([a,b])
 *(a::Machine, b::Machine)  = BestLearner([a,b])
 |(a::Machine, b::Machine)  = BestLearner([a,b])

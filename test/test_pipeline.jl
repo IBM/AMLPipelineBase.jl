@@ -11,8 +11,8 @@ using AMLPipelineBase.Utils
 const data     = getiris()
 const features = data[:,1:4]
 const X        = data[:,1:5]
-const Y               = data[:,5] |> Vector
-X[!,5]                = X[!,5] .|> string
+const Y        = data[:,5] |> Vector
+X[!,5]         = X[!,5] .|> string
 
 const ohe = OneHotEncoder()
 const noop = Identity()
@@ -35,6 +35,9 @@ function test_pipeline()
   res1 = fit_transform!(combo1,X)
   res2 = fit_transform!(combo2,X)
   @test (res1 .== res2) |> Matrix |> sum == 2100
+  res1 = fit_transform(combo1,X)
+  res2 = fit_transform(combo2,X)
+  @test (res1 .== res2) |> Matrix |> sum == 2100
   res3=transform!(combo2,X)
   res4=fit_transform!(combo2,X)
   @test (res3 .== res4) |> Matrix |> sum == 2100
@@ -47,6 +50,8 @@ function test_pipeline()
   @test (res5 .== res2) |> Matrix |> sum == 2100
   res6 = fit_transform!(combo5,X)
   @test (res6 .== res2) |> Matrix |> sum == 2100
+  res7 = fit_transform(combo5,X)
+  @test (res6 .== res7) |> Matrix |> sum == 2100
 end
 @testset "Pipelines" begin
   Random.seed!(123)
@@ -78,7 +83,9 @@ function test_pipeline()
   pcombo2 = @pipeline ohe + noop
   pcombo3 = ohe + noop
   @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
+  @test fit_transform(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
   @test fit_transform!(pcombo3,features) |> Matrix |> size |> collect |> sum == 158
+  @test fit_transform(pcombo3,features) |> Matrix |> size |> collect |> sum == 158
   pcombo4 = @pipeline ohe + noop |> rf
   pcombo5 = (ohe + noop) |> rf
   @test crossvalidate(pcombo4,X,Y,acc,5,false).mean >= 0.90
@@ -87,6 +94,19 @@ end
 @testset "Symbolic Pipeline: Local Scope" begin
   Random.seed!(123)
   test_pipeline()
+end
+
+function test_split()
+   dt1 = train_test_split(features,Y)
+   perf1 = pipe_performance(rf,(x,y)->score(:accuracy,x,y), dt1.trX,dt1.trY,dt1.tstX,dt1.tstY)
+   @test perf1 > 50.0
+   dt2 = train_test_split(data[:,1:3],Vector(data[:,4]))
+   perf2 = pipe_performance(rf,(x,y)->score(:rmse,x,y), dt2.trX,dt2.trY,dt2.tstX,dt2.tstY)
+   @test perf2 < 0.50
+end
+@testset "Performance and train/test split" begin
+  Random.seed!(123)
+  test_split()
 end
 
 end

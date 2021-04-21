@@ -6,14 +6,14 @@ import IterTools: product
 import MLBase
 
 # standard included modules
-using DataFrames
+using DataFrames: DataFrame, nrow
 using Random
 
 using ..AbsTypes
 using ..Utils
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 export VoteEnsemble, StackEnsemble, BestLearner
 
 using ..DecisionTreeLearners
@@ -72,13 +72,20 @@ end
 
 Training phase of the ensemble.
 """
-function fit!(ve::VoteEnsemble, instances::DataFrame, labels::Vector)
+function fit!(ve::VoteEnsemble, instances::DataFrame, labels::Vector)::Nothing
+  @assert nrow(instances) == length(labels)
   # Train all learners
   learners = ve.model[:learners]
   for learner in learners
     fit!(learner, instances, labels)
   end
   ve.model[:learners] = learners 
+  return nothing
+end
+
+function fit(ve::VoteEnsemble, instances::DataFrame, labels::Vector)::VoteEnsemble
+   fit!(ve, instances, labels)
+   return deepcopy(ve)
 end
 
 """
@@ -86,12 +93,17 @@ end
 
 Prediction phase of the ensemble.
 """
-function transform!(ve::VoteEnsemble, instances::DataFrame)
+function transform!(ve::VoteEnsemble, instances::DataFrame)::Vector
+  isempty(instances) && return []
   # Make learners vote
   learners = ve.model[:learners]
   predictions = map(learner -> transform!(learner, instances), learners)
   # Return majority vote prediction
   return StatsBase.mode(predictions)
+end
+
+function transform(ve::VoteEnsemble, instances::DataFrame)::Vector
+   return transform!(ve,instances)
 end
 
 """
@@ -164,7 +176,8 @@ Training phase of the stack of learners.
 - train stacker on learners' outputs
 - build final model from the trained learners
 """
-function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)
+function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)::Nothing
+  @assert nrow(instances) == length(labels)
   learners = se.model[:learners]
   num_learners = size(learners, 1)
   num_instances = size(instances, 1)
@@ -200,6 +213,12 @@ function fit!(se::StackEnsemble, instances::DataFrame, labels::Vector)
   se.model[:stacker] = stacker 
   se.model[:label_map] = label_map 
   se.model[:keep_original_features] = keep_original_features
+  return nothing
+end
+
+function fit(se::StackEnsemble, instances::DataFrame, labels::Vector)::StackEnsemble
+   fit!(se,instances,labels)
+   return deepcopy(se)
 end
 
 """
@@ -207,7 +226,8 @@ end
 
 Build stacker instances and predict
 """
-function transform!(se::StackEnsemble, instances::DataFrame)
+function transform!(se::StackEnsemble, instances::DataFrame)::Vector
+  isempty(instances) && return []
   # Build stacker instances
   learners = se.model[:learners]
   stacker = se.model[:stacker]
@@ -218,6 +238,10 @@ function transform!(se::StackEnsemble, instances::DataFrame)
 
   # Predict
   return transform!(stacker, stacker_instances)
+end
+
+function transform(se::StackEnsemble, instances::DataFrame)::Vector
+   transform!(se,instances)
 end
 
 # Build stacker instances.
@@ -335,7 +359,8 @@ Training phase:
 - generate partitions
 - train each learner on each partition and obtain validation output
 """
-function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)
+function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)::Nothing
+  @assert nrow(instances) == length(labels)
   # Obtain learners as is if no options grid present 
   if bls.model[:learner_options_grid] == nothing
     learners = bls.model[:learners]
@@ -411,6 +436,12 @@ function fit!(bls::BestLearner, instances::DataFrame, labels::Vector)
   bls.model[:best_learner_index]       = best_learner_index
   bls.model[:learners]                 = learners
   bls.model[:learner_partition_scores] = learner_partition_scores
+  return nothing
+end
+
+function fit(bls::BestLearner, instances::DataFrame, labels::Vector)::BestLearner
+   fit!(bls,instances,labels)
+   return deepcopy(bls)
 end
 
 """ 
@@ -418,8 +449,13 @@ end
 
 Choose the best learner based on cross-validation results and use it for prediction.
 """
-function transform!(bls::BestLearner, instances::DataFrame)
+function transform!(bls::BestLearner, instances::DataFrame)::Vector
+   isempty(instances) && return []
    transform!(bls.model[:best_learner], instances)
+end
+
+function transform(bls::BestLearner, instances::DataFrame)::Vector
+   transform!(bls,instances)
 end
 
 end # module

@@ -3,9 +3,8 @@ module TestUtil
 using Test
 using AMLPipelineBase
 using AMLPipelineBase.Utils
-using DataFrames
+using DataFrames: nrow
 using Random
-
 
 function test_utils()
   data = getiris()
@@ -44,7 +43,6 @@ end
   test_utils()
 end
 
-
 function test_metric()
    data = getiris()
    X=data[:,2:end]
@@ -54,7 +52,7 @@ function test_metric()
    numf = NumFeatureSelector()
    ohe = OneHotEncoder()
 
-   pl = @pipeline (catf |> ohe) + (numf) |> rf
+   pl = (catf |> ohe) + (numf) |> rf
 
    rmse(X,Y) = score(:rmse,X,Y)
    @test crossvalidate(pl,X,Y,rmse,10,false).mean < 0.5
@@ -70,10 +68,15 @@ function test_metric()
 
    @test crossvalidate(pl,X,Y,mae,10,false).mean < 0.2
    @test crossvalidate(pl,X,Y;metric=mae,verbose=false).mean < 0.2
+
+   tx,ty,tsx,tsy = train_test_split(data[:,1:4],data.Species |> collect)
+   fit!(pl,tx,ty)
+   score(:accuracy,transform!(pl,tsx),tsy) > 0.50
+   pl1 = fit(pl,tx,ty)
+   score(:accuracy,transform(pl1,tsx),tsy) > 0.50
 end
 @testset "Utils Metrics" begin
   test_metric()
 end
-
 
 end

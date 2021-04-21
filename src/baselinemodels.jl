@@ -1,15 +1,15 @@
 module BaselineModels
 
 using Random
-using DataFrames
+using DataFrames: DataFrame, nrow
 using StatsBase: mode
 
 using ..Utils
 using ..AbsTypes
 
-import ..AbsTypes: fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
 
-export fit!,transform!
+export fit, fit!, transform, transform!
 export Baseline, Identity
 
 """
@@ -54,8 +54,15 @@ end
 
 Get the mode of the training data.
 """
-function fit!(bsl::Baseline,x::DataFrame,y::Vector)
+function fit!(bsl::Baseline,x::DataFrame,y::Vector)::Nothing
+   @assert nrow(x) == length(y)
    bsl.model[:choice] = bsl.model[:strat](y)
+   return nothing
+end
+
+function fit(bsl::Baseline,x::DataFrame,y::Vector)::Baseline
+   fit!(bsl,x,y)
+   return deepcopy(bsl)
 end
 
 """
@@ -63,8 +70,13 @@ end
 
 Return the mode in classification.
 """
-function transform!(bsl::Baseline,x::DataFrame)
+function transform!(bsl::Baseline,x::DataFrame)::Vector
+  isempty(x) && return []
   fill(bsl.model[:choice],size(x,1))
+end
+
+function transform(bsl::Baseline,x::DataFrame)::Vector
+   return transform!(bsl,x)
 end
 
 """
@@ -87,7 +99,7 @@ mutable struct Identity <: Transformer
 end
 
 """
-    Baseline(name::String,opt...)
+    Identity(name::String,opt...)
 
  Helper function
 """
@@ -100,8 +112,12 @@ end
 
 Does nothing.
 """
-function fit!(idy::Identity,x::DataFrame,y::Vector)
+function fit!(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])::Nothing
     nothing
+end
+
+function fit(idy::Identity,x::DataFrame=DataFrame(),y::Vector=[])::Identity
+   return idy
 end
 
 """
@@ -109,7 +125,11 @@ end
 
 Return the input as output.
 """
-function transform!(idy::Identity,x::DataFrame)
+function transform!(idy::Identity,x::DataFrame=DataFrame())::DataFrame
+    return x
+end
+
+function transform(idy::Identity,x::DataFrame=DataFrame())::DataFrame
     return x
 end
 

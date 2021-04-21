@@ -4,14 +4,14 @@ module DecisionTreeLearners
 import DecisionTree
 DT = DecisionTree
 # standard included modules
-using DataFrames
+using DataFrames: DataFrame, nrow
 using Random
 
 using ..AbsTypes
 using ..Utils
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 
 export PrunedTree, RandomForest, Adaboost
 
@@ -79,7 +79,8 @@ end
 
 Optimize the hyperparameters of `PrunedTree` instance.
 """
-function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector) 
+function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector)::Nothing
+  @assert nrow(features) == length(labels)
   instances=Matrix(features)
   args = ptree.model[:impl_args]
   btreemodel = DT.build_tree(
@@ -93,20 +94,29 @@ function fit!(ptree::PrunedTree, features::DataFrame, labels::Vector)
   btreemodel = DT.prune_tree(btreemodel, args[:purity_threshold])
   ptree.model[:dtmodel] = btreemodel
   ptree.model[:impl_args] = args
+  return nothing
 end
 
+function fit(ptree::PrunedTree, features::DataFrame, labels::Vector)::PrunedTree
+   fit!(ptree,features,labels)
+   return deepcopy(ptree)
+end
 
 """
     transform!(ptree::PrunedTree, features::DataFrame)
 
 Predict using the optimized hyperparameters of the trained `PrunedTree` instance.
 """
-function transform!(ptree::PrunedTree, features::DataFrame)
+function transform!(ptree::PrunedTree, features::DataFrame)::Vector
+  isempty(features) && return []
   instances=Matrix(features)
   model = ptree.model[:dtmodel]
   return DT.apply_tree(model, instances)
 end
 
+function transform(ptree::PrunedTree, features::DataFrame)::Vector
+   return transform!(ptree,features)
+end
 
 # Random forest (CART).
 
@@ -172,7 +182,8 @@ end
 
 Optimize the parameters of the `RandomForest` instance.
 """
-function fit!(forest::RandomForest, features::DataFrame, labels::Vector) 
+function fit!(forest::RandomForest, features::DataFrame, labels::Vector)::Nothing
+  @assert nrow(features) == length(labels)
   instances=Matrix(features)
   # Set training-dependent options
   impl_args = forest.model[:impl_args]
@@ -187,7 +198,14 @@ function fit!(forest::RandomForest, features::DataFrame, labels::Vector)
   )
   forest.model[:dtmodel] = model
   forest.model[:impl_args] = impl_args
+  return nothing
 end
+
+function fit(forest::RandomForest, features::DataFrame, labels::Vector)::RandomForest
+   fit!(forest, features, labels)
+   return deepcopy(forest)
+end
+
 
 
 """
@@ -196,13 +214,17 @@ end
 
 Predict using the optimized hyperparameters of the trained `RandomForest` instance.
 """
-function transform!(forest::RandomForest, features::DataFrame)
+function transform!(forest::RandomForest, features::DataFrame)::Vector
+  isempty(features) && return []
   instances = features
   instances = Matrix(features)
   model = forest.model[:dtmodel]
   return DT.apply_forest(model, instances)
 end
 
+function transform(forest::RandomForest, features::DataFrame)::Vector
+   return transform!(forest, features)
+end
 
 # Adaboosted decision stumps.
 
@@ -253,7 +275,8 @@ end
 
 Optimize the hyperparameters of `Adaboost` instance.
 """
-function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector) 
+function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector)::Nothing
+  @assert nrow(features) == length(labels)
   instances = Matrix(features)
   # NOTE(svs14): Variable 'model' renamed to 'ensemble'.
   #              This differs to DecisionTree
@@ -264,6 +287,12 @@ function fit!(adaboost::Adaboost, features::DataFrame, labels::Vector)
   )
   adaboost.model[:ensemble] = ensemble
   adaboost.model[:coefficients] = coefficients
+  return nothing
+end
+
+function fit(adaboost::Adaboost, features::DataFrame, labels::Vector)::Adaboost
+   fit!(adaboost, features, labels)
+   return deepcopy(adaboost)
 end
 
 """
@@ -271,12 +300,16 @@ end
 
 Predict using the optimized hyperparameters of the trained `Adaboost` instance.
 """
-function transform!(adaboost::Adaboost, features::DataFrame)
+function transform!(adaboost::Adaboost, features::DataFrame)::Vector
+  isempty(features) && return []
   instances = Matrix(features)
   return DT.apply_adaboost_stumps(
     adaboost.model[:ensemble], adaboost.model[:coefficients], instances
   )
 end
 
+function transform(adaboost::Adaboost, features::DataFrame)::Vector
+   return transform!(adaboost, features)
+end
 
 end # module

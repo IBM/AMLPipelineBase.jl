@@ -1,14 +1,14 @@
 module FeatureSelectors
 
-using DataFrames
+using DataFrames: DataFrame
 using Random
 
 using ..AbsTypes
 using ..BaseFilters
 using ..Utils
 
-import ..AbsTypes: fit!, transform!
-export fit!, transform!
+import ..AbsTypes: fit, fit!, transform, transform!
+export fit, fit!, transform, transform!
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
 # generic way to extract num/cat features by specifying their columns
@@ -55,13 +55,16 @@ Helper function for FeatureSelector.
 """
 FeatureSelector(cols::Vararg{Int}) = FeatureSelector([cols...])
 
-function fit!(ft::FeatureSelector, features::DataFrame, labels::Vector=[])
-   if features == DataFrame()
-      throw(ArgumentError("empty dataframe"))
-   end
+function fit!(ft::FeatureSelector, features::DataFrame, labels::Vector=[])::Nothing
+   return nothing
 end
 
-function transform!(ft::FeatureSelector, features::DataFrame)
+function fit(ft::FeatureSelector, features::DataFrame, labels::Vector=[])::FeatureSelector
+   return ft
+end
+
+function transform!(ft::FeatureSelector, features::DataFrame)::DataFrame
+   isempty(features) && return DataFrame()
    nfeatures = deepcopy(features) 
    if nfeatures == DataFrame()
       throw(ArgumentError("empty dataframe"))
@@ -72,6 +75,10 @@ function transform!(ft::FeatureSelector, features::DataFrame)
    else
       return DataFrame()
    end
+end
+
+function transform(ft::FeatureSelector, features::DataFrame)::DataFrame
+   return transform!(ft,features)
 end
 
 # ----------
@@ -98,7 +105,7 @@ mutable struct CatFeatureSelector <: Transformer
    end
 end
 
-function fit!(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])
+function fit!(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])::Nothing
     if features == DataFrame()
        throw(ArgumentError("empty dataframe"))
     end
@@ -106,9 +113,16 @@ function fit!(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])
 
     # create model
     ft.model[:nominal_columns] = catcols
+    return nothing
 end
 
-function transform!(ft::CatFeatureSelector, features::DataFrame)
+function fit(ft::CatFeatureSelector, features::DataFrame, labels::Vector=[])::CatFeatureSelector
+   fit!(ft,features,labels)
+   return deepcopy(ft)
+end
+
+function transform!(ft::CatFeatureSelector, features::DataFrame)::DataFrame
+   isempty(features) && return DataFrame()
    nfeatures = deepcopy(features)
    catcols = ft.model[:nominal_columns]
    if catcols != []
@@ -116,6 +130,10 @@ function transform!(ft::CatFeatureSelector, features::DataFrame)
    else
       return DataFrame()
    end
+end
+
+function transform(ft::CatFeatureSelector, features::DataFrame)::DataFrame
+   transform!(ft,features)
 end
 
 """
@@ -140,7 +158,7 @@ mutable struct NumFeatureSelector <: Transformer
    end
 end
 
-function fit!(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])
+function fit!(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])::Nothing
     if features == DataFrame()
        throw(ArgumentError("empty dataframe"))
     end
@@ -148,9 +166,16 @@ function fit!(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])
 
     # create model
     ft.model[:numcols] = numcols
+    return nothing
 end
 
-function transform!(ft::NumFeatureSelector, features::DataFrame)
+function fit(ft::NumFeatureSelector, features::DataFrame, labels::Vector=[])::NumFeatureSelector
+   fit!(ft,features,labels)
+   return deepcopy(ft)
+end
+
+function transform!(ft::NumFeatureSelector, features::DataFrame)::DataFrame
+   isempty(features) && return DataFrame()
    nfeatures = deepcopy(features)
    numcols = ft.model[:numcols]
    if numcols != [] 
@@ -158,6 +183,10 @@ function transform!(ft::NumFeatureSelector, features::DataFrame)
    else
       return DataFrame()
    end
+end
+
+function transform(ft::NumFeatureSelector, features::DataFrame)::DataFrame
+   transform!(ft,features)
 end
 
 """
@@ -200,7 +229,7 @@ function CatNumDiscriminator(maxcat::Int)
     CatNumDiscriminator(Dict(:maxcategories=>maxcat))
 end
 
-function fit!(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])
+function fit!(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])::Nothing
     if features == DataFrame()
        throw(ArgumentError("empty dataframe"))
     end
@@ -209,15 +238,26 @@ function fit!(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])
     # create model
     ft.model[:numcols] = numcols
     ft.model[:nominal_columns] = catcols
+    return nothing
 end
 
-function transform!(ft::CatNumDiscriminator, features::DataFrame)
+function fit(ft::CatNumDiscriminator, features::DataFrame, labels::Vector=[])::CatNumDiscriminator
+   fit!(ft,features,labels)
+   return deepcopy(ft)
+end
+
+function transform!(ft::CatNumDiscriminator, features::DataFrame)::DataFrame
+    isempty(features) && DataFrame()
     nfeatures = features |> deepcopy
     catcols = ft.model[:nominal_columns]
     if catcols != [] 
 		nfeatures[!,catcols] = nfeatures[!,catcols] .|> string
     end
     return nfeatures
+end
+
+function transform(ft::CatNumDiscriminator, features::DataFrame)::DataFrame
+   return transform!(ft,features)
 end
 
 end
