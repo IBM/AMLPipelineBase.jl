@@ -35,6 +35,9 @@ function test_pipeline()
   res1 = fit_transform!(combo1,X)
   res2 = fit_transform!(combo2,X)
   @test (res1 .== res2) |> Matrix |> sum == 2100
+  res1 = fit_transform(combo1,X)
+  res2 = fit_transform(combo2,X)
+  @test (res1 .== res2) |> Matrix |> sum == 2100
   res3=transform!(combo2,X)
   res4=fit_transform!(combo2,X)
   @test (res3 .== res4) |> Matrix |> sum == 2100
@@ -47,6 +50,8 @@ function test_pipeline()
   @test (res5 .== res2) |> Matrix |> sum == 2100
   res6 = fit_transform!(combo5,X)
   @test (res6 .== res2) |> Matrix |> sum == 2100
+  res7 = fit_transform(combo5,X)
+  @test (res6 .== res7) |> Matrix |> sum == 2100
 end
 @testset "Pipelines" begin
   Random.seed!(123)
@@ -78,7 +83,9 @@ function test_pipeline()
   pcombo2 = @pipeline ohe + noop
   pcombo3 = ohe + noop
   @test fit_transform!(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
+  @test fit_transform(pcombo2,features) |> Matrix |> size |> collect |> sum == 158
   @test fit_transform!(pcombo3,features) |> Matrix |> size |> collect |> sum == 158
+  @test fit_transform(pcombo3,features) |> Matrix |> size |> collect |> sum == 158
   pcombo4 = @pipeline ohe + noop |> rf
   pcombo5 = (ohe + noop) |> rf
   @test crossvalidate(pcombo4,X,Y,acc,5,false).mean >= 0.90

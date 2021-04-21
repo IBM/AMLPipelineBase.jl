@@ -3,7 +3,7 @@ module TestEnsembleMethods
 using Test
 using Random
 using AMLPipelineBase
-using DataFrames
+using DataFrames: nrow
 
 function generateXY()
     Random.seed!(123)
@@ -16,14 +16,16 @@ end
 
 function getprediction(model,features,output)
   res = fit_transform!(model,features,output)
-  sum(res .== output)/length(output)*100
+  res1 = fit_transform(model,features,output)
+  @test sum(res .== output)/length(output)*100 > 90.0
+  @test sum(res1 .== output)/length(output)*100 > 90.0
 end
 
 function test_ensembles()
   tstfeatures,tstoutput = generateXY()
   models = [VoteEnsemble(),StackEnsemble(),BestLearner()]
   for model in models
-    @test getprediction(model,tstfeatures,tstoutput) > 90.0
+     getprediction(model,tstfeatures,tstoutput) 
   end
 end
 @testset "Ensemble learners" begin
