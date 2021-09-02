@@ -21,16 +21,16 @@ function iris_test()
     @test (fit_transform(catf,X) .== X[:,5]) |> Matrix |> sum == 150
     @test (fit_transform!(numf,X) .== X[:,1:4]) |> Matrix |> sum == 600
     @test (fit_transform(numf,X) .== X[:,1:4]) |> Matrix |> sum == 600
-    catnumdata = hcat(X,repeat([1,2,3,4,5],30))
+    catnumdata = hcat(X,DataFrame(x1=repeat([1,2,3,4,5],30)))
     catnum = CatNumDiscriminator()
     res = fit_transform!(catnum,catnumdata)
     @test infer_eltype(catnumdata[:,[2,4,6]]) <: Number
     @test infer_eltype(res[:,[2,4,6]]) <: String
-    catnumdata = hcat(X,repeat([1,2,3,4,5],30))
+    catnumdata = hcat(X,DataFrame(x1=repeat([1,2,3,4,5],30)))
     catnum = CatNumDiscriminator(0)
     res = fit_transform!(catnum,catnumdata)
     @test eltype(res[:,6]) <: Number
-    catnumdata = hcat(X,repeat([1,2,3,4,5],30))
+    catnumdata = hcat(X,DataFrame(x1=repeat([1,2,3,4,5],30)))
     res1 = fit_transform(catnum,catnumdata)
     @test eltype(res1[:,6]) <: Number
 end
