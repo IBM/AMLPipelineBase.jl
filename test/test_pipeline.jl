@@ -19,6 +19,10 @@ const noop = Identity()
 const rf  = RandomForest()
 const ada = Adaboost()
 const pt  = PrunedTree()
+const numf  = NumFeatureSelector()
+const catf  = CatFeatureSelector()
+
+acc(X,Y) = score(:accuracy,X,Y)
 
 function test_pipeline()
   # test initialization of types
@@ -58,7 +62,6 @@ end
   test_pipeline()
 end
 
-acc(X,Y) = score(:accuracy,X,Y)
 
 function test_sympipeline()
   pcombo5 = @pipeline :((ohe + noop) |> (ada * rf * pt))
@@ -77,6 +80,17 @@ end
   Random.seed!(123)
   test_sympipeline()
 end
+
+function test_advancedpipeline()
+   expr = @pipeline ((((ada) + (rf) ) |> ohe) + numf) |> ada;
+   @test crossvalidate(expr,X,Y,acc,5,false).mean >= 0.90
+end
+@testset "Advanced Pipeline: Learners as filters" begin
+  Random.seed!(123)
+  test_advancedpipeline()
+end
+
+
 
 function test_pipeline()
   # test symbolic pipeline expression 

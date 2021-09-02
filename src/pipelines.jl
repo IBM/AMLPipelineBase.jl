@@ -188,11 +188,23 @@ function transform!(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union
   new_instances = DataFrame()
   for t_index in eachindex(machines)
     machine = machines[t_index]
-    current_instances = transform!(machine, instances)
-    new_instances = hcat(new_instances,current_instances,makeunique=true)
+    current_instances = transform!(machine, instances) 
+    new_instances = mcat(new_instances,current_instances)
   end
-
   return new_instances
+end
+
+# dispatch concat between vectors/dataframes
+function mcat(x::DataFrame,y::DataFrame)
+   hcat(x,y,makeunique=true)
+end
+
+function mcat(x::DataFrame,y::Vector)
+   hcat(x,DataFrame(v=y),makeunique=true)
+end
+
+function mcat(x::Vector,y::DataFrame)
+   hcat(DataFrame(v=x),y,makeunique=true)
 end
 
 function transform(pipe::ComboPipeline, features::DataFrame=DataFrame())::Union{Vector,DataFrame}
