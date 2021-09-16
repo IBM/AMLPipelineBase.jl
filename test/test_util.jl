@@ -22,7 +22,7 @@ function test_utils()
   @test score(:accuracy,Y,Y) == 100.0
   @test score(:accuracy,Y,reverse(Y)) |> round == 33.0
 
-  @test infer_eltype.(eachcol(data)) == [Float64,Float64,Float64,Float64,String]
+  @test (infer_eltype.(eachcol(data)) .<: [Float64,Float64,Float64,Float64,AbstractString]) |> sum == 5
 
   dc = Dict(Dict(:a=>:c,:d=>Dict(:e=>:f)))
   @test nested_dict_to_tuples(dc) == Set(Any[([:d, :e], :f), ([:a], :c)]) 
