@@ -2,7 +2,7 @@
 ---------------
 | **Documentation** | **Build Status** | **Help** |
 |:---:|:---:|:---:|
-| [![][docs-dev-img]][docs-dev-url] [![][docs-stable-img]][docs-stable-url] | [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] | [![][slack-img]][slack-url] [![][gitter-img]][gitter-url] |
+| [![][docs-dev-img]][docs-dev-url] [![][docs-stable-img]][docs-stable-url] | [![][travis-img]][travis-url] | [![][slack-img]][slack-url] [![][gitter-img]][gitter-url] |
 
 [AMLPipelineBase.jl](https://github.com/IBM/AMLPipelineBase.jl) 
 is the **Base** package of [TSML.jl](https://github.com/IBM/TSML.jl),
