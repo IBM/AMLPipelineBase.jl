@@ -61,7 +61,7 @@ function VoteEnsemble(learners::Vector{<:Learner}; opt...)
    VoteEnsemble(Dict(:learners => learners, Dict(pairs(opt))...))
 end
 
-function VoteEnsemble(learners::Vararg{<:Learner})
+function VoteEnsemble(learners::Vararg{Learner})
    (eltype(learners) <: Learner) || throw(ArgumentError("argument setup error"))
    v=[x for x in learners] # convert tuples to vector
    VoteEnsemble(v)
@@ -158,7 +158,7 @@ function StackEnsemble(learners::Vector{<:Learner}; opt...)
    StackEnsemble(Dict(:learners => learners, Dict(pairs(opt))...))
 end
 
-function StackEnsemble(learners::Vararg{<:Learner})
+function StackEnsemble(learners::Vararg{Learner})
    (eltype(learners) <: Learner) || throw(ArgumentError("argument setup error"))
    v=[x for x in learners] # convert tuples to vector
    StackEnsemble(v)
@@ -341,7 +341,7 @@ function BestLearner(learners::Vector{<:Learner}; opt...)
    BestLearner(Dict(:learners => learners, Dict(pairs(opt))...))
 end
 
-function BestLearner(learners::Vararg{<:Learner})
+function BestLearner(learners::Vararg{Learner})
    (eltype(learners) <: Learner) || throw(ArgumentError("argument setup error"))
    v=[x for x in learners] # convert tuples to vector
    BestLearner(v)

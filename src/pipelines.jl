@@ -61,7 +61,7 @@ end
 
 Helper function for Pipeline structure.
 """
-function Pipeline(machs::Vararg{<:Machine})
+function Pipeline(machs::Vararg{Machine})
    (eltype(machs) <: Machine) || throw(ArgumentError("argument setup error"))
    v=[x for x in machs] # convert tuples to vector
    combo = Pipeline(v)
@@ -150,7 +150,7 @@ function ComboPipeline(machs::Vector{<:Machine};opt...)
    ComboPipeline(Dict(:machines=>machs,:machine_args=>Dict(pairs(opt))))
 end
 
-function ComboPipeline(machs::Vararg{<:Machine})
+function ComboPipeline(machs::Vararg{Machine})
    (eltype(machs) <: Machine) || throw(ArgumentError("argument setup error"))
    v=[eval(x) for x in machs] # convert tuples to vector
    combo = ComboPipeline(v)
