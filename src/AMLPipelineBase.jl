@@ -1,11 +1,21 @@
 module AMLPipelineBase
 
-include("abstracttypes.jl")
+using PrecompileTools: @setup_workload, @compile_workload
+
+@setup_workload begin
+    @compile_workload begin
+        include("abstracttypes.jl")
+    end
+end
 using .AbsTypes
 export Machine, Computer, Workflow, Learner, Transformer
 export fit, fit!, transform, transform!, fit_transform, fit_transform!
 
-include("utils.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("utils.jl")
+    end
+end
 using .Utils
 export holdout, kfold, score, infer_eltype, 
        nested_dict_to_tuples, 
@@ -20,7 +30,11 @@ export holdout, kfold, score, infer_eltype,
        train_test_split
 
 
-include("baselinemodels.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("baselinemodels.jl")
+    end
+end
 using .BaselineModels
 export Baseline, Identity
 
@@ -28,27 +42,52 @@ include("basefilters.jl")
 using .BaseFilters
 export Imputer, OneHotEncoder, Wrapper
 
-include("featureselector.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("featureselector.jl")
+    end
+end
 using .FeatureSelectors
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
-include("decisiontree.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("decisiontree.jl")
+    end
+end
 using .DecisionTreeLearners
 export PrunedTree, RandomForest, Adaboost
 
-include("ensemble.jl")
+
+@setup_workload begin
+    @compile_workload begin
+        include("ensemble.jl")
+    end
+end
 using .EnsembleMethods
 export VoteEnsemble, StackEnsemble, BestLearner
 
-include("crossvalidator.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("crossvalidator.jl")
+    end
+end
 using .CrossValidators
 export crossvalidate, pipe_performance
 
-include("naremover.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("naremover.jl")
+    end
+end
 using .NARemovers
 export NARemover
 
-include("pipelines.jl")
+@setup_workload begin
+    @compile_workload begin
+        include("pipelines.jl")
+    end
+end
 using .Pipelines
 export @pipeline, @pipelinex, @pipelinez
 export |>, +, |, *, >>
