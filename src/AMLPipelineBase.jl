@@ -1,21 +1,12 @@
 module AMLPipelineBase
 
-using PrecompileTools: @setup_workload, @compile_workload
 
-@setup_workload begin
-    @compile_workload begin
-        include("abstracttypes.jl")
-    end
-end
+include("abstracttypes.jl")
 using .AbsTypes
 export Machine, Computer, Workflow, Learner, Transformer
 export fit, fit!, transform, transform!, fit_transform, fit_transform!
 
-@setup_workload begin
-    @compile_workload begin
-        include("utils.jl")
-    end
-end
+include("utils.jl")
 using .Utils
 export holdout, kfold, score, infer_eltype, 
        nested_dict_to_tuples, 
@@ -30,11 +21,7 @@ export holdout, kfold, score, infer_eltype,
        train_test_split
 
 
-@setup_workload begin
-    @compile_workload begin
-        include("baselinemodels.jl")
-    end
-end
+include("baselinemodels.jl")
 using .BaselineModels
 export Baseline, Identity
 
@@ -42,52 +29,27 @@ include("basefilters.jl")
 using .BaseFilters
 export Imputer, OneHotEncoder, Wrapper
 
-@setup_workload begin
-    @compile_workload begin
         include("featureselector.jl")
-    end
-end
 using .FeatureSelectors
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
-@setup_workload begin
-    @compile_workload begin
-        include("decisiontree.jl")
-    end
-end
+include("decisiontree.jl")
 using .DecisionTreeLearners
 export PrunedTree, RandomForest, Adaboost
 
-
-@setup_workload begin
-    @compile_workload begin
-        include("ensemble.jl")
-    end
-end
+include("ensemble.jl")
 using .EnsembleMethods
 export VoteEnsemble, StackEnsemble, BestLearner
 
-@setup_workload begin
-    @compile_workload begin
-        include("crossvalidator.jl")
-    end
-end
+include("crossvalidator.jl")
 using .CrossValidators
 export crossvalidate, pipe_performance
 
-@setup_workload begin
-    @compile_workload begin
-        include("naremover.jl")
-    end
-end
+include("naremover.jl")
 using .NARemovers
 export NARemover
 
-@setup_workload begin
-    @compile_workload begin
-        include("pipelines.jl")
-    end
-end
+include("pipelines.jl")
 using .Pipelines
 export @pipeline, @pipelinex, @pipelinez
 export |>, +, |, *, >>
