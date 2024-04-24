@@ -29,7 +29,7 @@ include("basefilters.jl")
 using .BaseFilters
 export Imputer, OneHotEncoder, Wrapper
 
-        include("featureselector.jl")
+include("featureselector.jl")
 using .FeatureSelectors
 export FeatureSelector, CatFeatureSelector, NumFeatureSelector, CatNumDiscriminator
 
@@ -54,5 +54,9 @@ using .Pipelines
 export @pipeline, @pipelinex, @pipelinez
 export |>, +, |, *, >>
 export Pipeline, ComboPipeline
+
+include("mvstats.jl")
+using .MultivarStats
+export testpca
 
 end # module
