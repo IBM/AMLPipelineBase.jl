@@ -28,18 +28,18 @@ it being excluded if it fails the acceptance critera.
 Implements `fit!` and `transform!`.
 """
 mutable struct NARemover <: Transformer
-   name::String
-   model::Dict{Symbol,Any}
+    name::String
+    model::Dict{Symbol,Any}
 
-   function NARemover(args::Dict = Dict())
-      default_args = Dict{Symbol,Any}(
-         :name => "nadetect",
-         :acceptance => 0.10
-      )
-      cargs=nested_dict_merge(default_args,args)
-      cargs[:name] = cargs[:name]*"_"*randstring(3)
-      new(cargs[:name],cargs)
-   end
+    function NARemover(args::Dict=Dict())
+        default_args = Dict{Symbol,Any}(
+            :name => "nadetect",
+            :acceptance => 0.10
+        )
+        cargs = nested_dict_merge(default_args, args)
+        cargs[:name] = cargs[:name] * "_" * randstring(3)
+        new(cargs[:name], cargs)
+    end
 end
 
 """
@@ -61,12 +61,12 @@ Checks and exit of df is empty
 - `labels::Vector=[]`: 
 """
 function fit!(nad::NARemover, features::DataFrame, labels::Vector=[])::Nothing
-   return nothing
+    return nothing
 end
 
 function fit(nad::NARemover, features::DataFrame, labels::Vector=[])::NARemover
-   fit!(nad,features,labels)
-   return deepcopy(nad)
+    fit!(nad, features, labels)
+    return deepcopy(nad)
 end
 
 
@@ -80,22 +80,22 @@ Removes columns with NAs greater than acceptance rate.
 - `nfeatures::DataFrame`: input
 """
 function transform!(nad::NARemover, nfeatures::DataFrame)::DataFrame
-   isempty(nfeatures) && return DataFrame()
-   features = deepcopy(nfeatures) 
-   sz = nrow(features)
-   tol = nad.model[:acceptance]
-   colnames = []
-   for (colname,dat) in collect(pairs(eachcol(features)))
-      if sum(ismissing.(dat)) < tol*sz
-         push!(colnames,colname)
-      end
-   end
-   xtr =  features[:,colnames]
-   return xtr
+    isempty(nfeatures) && return DataFrame()
+    features = deepcopy(nfeatures)
+    sz = nrow(features)
+    tol = nad.model[:acceptance]
+    colnames = []
+    for (colname, dat) in collect(pairs(eachcol(features)))
+        if sum(ismissing.(dat)) < tol * sz
+            push!(colnames, colname)
+        end
+    end
+    xtr = features[:, colnames]
+    return xtr
 end
 
 function transform(nad::NARemover, nfeatures::DataFrame)::DataFrame
-   return transform!(nad,nfeatures)
+    return transform!(nad, nfeatures)
 end
 
 end
