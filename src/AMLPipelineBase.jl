@@ -8,17 +8,16 @@ export fit, fit!, transform, transform!, fit_transform, fit_transform!
 
 include("utils.jl")
 using .Utils
-export holdout, kfold, score, infer_eltype,
-    nested_dict_to_tuples,
-    nested_dict_set!,
-    nested_dict_merge,
-    create_transformer,
-    mergedict, getiris,
-    skipmean, skipmedian, skipstd,
-    aggregatorclskipmissing,
-    getiris, getprofb,
-    find_catnum_columns,
-    train_test_split
+export holdout, kfold, score, infer_eltype
+export nested_dict_to_tuples
+export nested_dict_set!
+export nested_dict_merge
+export mergedict, getiris
+export skipmean, skipmedian, skipstd
+export aggregatorclskipmissing
+export getiris, getprofb
+export find_catnum_columns
+export train_test_split
 
 
 include("baselinemodels.jl")
