@@ -1,0 +1,58 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+
+jobs:
+  test:
+    name: Test Julia ${{ matrix.jlversion }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64]
+        os: [ubuntu-latest]
+        jlversion: ["1", "1.10"]
+        include:
+          - os: windows-latest
+            jlversion: "1"
+            arch: x64
+          - os: macos-latest
+            jlversion: "1"
+            arch: aarch64
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Julia ${{matrix.jlversion}}
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.jlversion }}
+          arch: ${{ matrix.arch }}
+
+      #      - name: Use julia-actions cache
+      #        uses: julia-actions/cache@v2
+
+      - name: Build package
+        uses: julia-actions/julia-buildpkg@v1
+
+      - name: Run tests
+        uses: julia-actions/julia-runtest@v1
+        env:
+          JULIA_NUM_THREADS: 4,1
+
+      - name: Process coverage
+        uses: julia-actions/julia-processcoverage@v1
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
